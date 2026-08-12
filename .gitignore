@@ -1,0 +1,32 @@
+# OS
+.DS_Store
+
+# Claude local settings (personal, not shared)
+.claude/settings.local.json
+
+# Secrets — belt-and-suspenders so the Anthropic API key can NEVER be committed,
+# regardless of where an env file lives. (wren/.gitignore also covers wren/.env.)
+**/.env
+**/.env.local
+**/.env*.local
+
+# Node / Expo build artifacts (also covered by wren/.gitignore)
+**/node_modules/
+wren/.expo/
+wren/dist/
+wren/web-build/
+
+# secrets / signing material (defense in depth at repo root)
+*.key
+*.pem
+*.p8
+*.p12
+*.jks
+*.mobileprovision
+
+# temp/lock junk
+*.tmp
+.~lock*
+
+# the app is its own repo (pushed separately)
+/wren/

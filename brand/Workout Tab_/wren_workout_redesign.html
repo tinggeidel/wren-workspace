@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wren — Workout Tab Redesign</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/manrope@5.2.5/400.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/manrope@5.2.5/500.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/manrope@5.2.5/600.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/manrope@5.2.5/700.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/manrope@5.2.5/800.css">
+<style>
+  :root{
+    --backdrop:#EFE7DA; --frame:#15100C; --screen:#FFFFFF;
+    --glaze:#FBF7F0; --cream:#F4EDE2; --creamTile:#F5EFE6; --vapor:#E3E8E9;
+    --ink:#3B2F22; --ink2:#5A4B3A; --clay:#8A7B68; --cocoaSoft:#6B5641;
+    --period:#B4564B; --luteal:#C68D8A; --mist:#D6CFC2; --calm:#7E9AA0; --calmFill:#DCE5E4;
+    --sage:#A8B89B; --tan:#C8A989; --slate:#4F6B70; --honey:#E8B86A;
+    --hair:rgba(59,47,34,0.12); --hairLite:rgba(59,47,34,0.07);
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--backdrop); font-family:'Manrope',system-ui,sans-serif; color:var(--ink);}
+  .stage{min-height:100vh; display:flex; flex-direction:column; align-items:center; gap:14px; padding:28px 0 48px;}
+  .cap{font-size:11px; letter-spacing:2.5px; color:var(--clay); font-weight:600; text-transform:uppercase;}
+
+  .phone{width:362px; background:linear-gradient(160deg,#221a13,#15100C 60%); border-radius:48px; padding:11px; box-shadow:0 38px 84px -22px rgba(40,28,16,.52);}
+  .screen{background:linear-gradient(180deg,#FFFFFF 0%, #FDFBF7 58%, #F7F1E8 100%); border-radius:38px; overflow:hidden; height:782px; position:relative; display:flex; flex-direction:column;}
+
+  .statusbar{display:flex; justify-content:space-between; align-items:center; padding:15px 26px 6px; font-size:13px; color:var(--ink); font-weight:600; flex-shrink:0;}
+  .statusbar .d{display:flex; gap:5px; align-items:center; font-size:11px;}
+
+  /* header */
+  .head{padding:8px 24px 2px; display:flex; justify-content:space-between; align-items:flex-end; flex-shrink:0;}
+  .head .eyebrow{font-size:9px; letter-spacing:2.5px; color:var(--luteal); font-weight:700; text-transform:uppercase;}
+  .head h1{font-weight:800; font-size:38px; color:var(--ink); line-height:1; letter-spacing:-1.8px; margin:7px 0 0;}
+  .avatar{width:42px; height:42px; border-radius:50%; background:radial-gradient(120% 120% at 32% 26%, #5A4632, #2A2016); display:flex; align-items:center; justify-content:center; color:var(--glaze); font-weight:700; font-size:13px; letter-spacing:-0.3px; margin-bottom:4px; flex-shrink:0; cursor:pointer; box-shadow:0 5px 12px -4px rgba(59,47,34,.5), inset 0 1px 0 rgba(255,255,255,.18);}
+
+  /* segmented toggle */
+  .toggle{margin:16px 24px 0; background:var(--vapor); border-radius:14px; padding:4px; display:flex; gap:4px; flex-shrink:0; box-shadow:inset 0 1px 3px rgba(59,47,34,.12);}
+  .toggle button{flex:1; border:none; background:transparent; padding:11px 0; border-radius:11px; font-family:inherit; font-size:13.5px; font-weight:700; color:var(--slate); cursor:pointer; transition:all .18s; letter-spacing:.2px;}
+  .toggle button.on{background:linear-gradient(180deg,#FFFFFF,#FBF7F1); color:var(--ink); box-shadow:0 3px 8px -2px rgba(59,47,34,.2), inset 0 1px 0 rgba(255,255,255,.9);}
+
+  /* day strip */
+  .strip{display:flex; gap:4px; padding:16px 18px 4px; flex-shrink:0;}
+  .day{flex:1; text-align:center; cursor:pointer;}
+  .day .dn{font-size:10px; letter-spacing:1px; color:var(--clay); font-weight:600;}
+  .day .dd{width:34px; height:34px; margin:7px auto 0; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; color:var(--ink2); position:relative; background:linear-gradient(160deg,#FBF6EE,#F1EADD); box-shadow:inset 0 1px 0 rgba(255,255,255,.8), 0 1px 2px rgba(59,47,34,.06);}
+  .day.today .dn{color:var(--ink);}
+  .day.today .dd{background:radial-gradient(120% 120% at 35% 25%, #5A4632, #2A2016); color:var(--glaze); box-shadow:0 8px 16px -5px rgba(59,47,34,.55), inset 0 1px 0 rgba(255,255,255,.2);}
+  .day .trained{position:absolute; bottom:-9px; left:50%; transform:translateX(-50%); width:5px; height:5px; border-radius:50%; background:var(--sage); box-shadow:0 0 0 3px rgba(168,184,155,.22);}
+  .day.today .trained{background:var(--honey); box-shadow:0 0 0 3px rgba(232,184,106,.28);}
+
+  /* scroll body */
+  .body{flex:1; overflow-y:auto; padding:10px 24px 14px;}
+  .body::-webkit-scrollbar{width:0;}
+  .enter > *{opacity:0; transform:translateY(10px); animation:rise .5s cubic-bezier(.2,.8,.2,1) forwards;}
+  .enter > *:nth-child(1){animation-delay:.02s}.enter > *:nth-child(2){animation-delay:.06s}
+  .enter > *:nth-child(3){animation-delay:.10s}.enter > *:nth-child(4){animation-delay:.14s}
+  .enter > *:nth-child(5){animation-delay:.18s}.enter > *:nth-child(6){animation-delay:.22s}
+  .enter > *:nth-child(7){animation-delay:.26s}.enter > *:nth-child(8){animation-delay:.30s}
+  .enter > *:nth-child(9){animation-delay:.34s}
+  @keyframes rise{to{opacity:1;transform:none;}}
+
+  /* program card */
+  .program{position:relative; overflow:hidden; background:linear-gradient(162deg,#F6EFE4,#FCF8F1); border:0.5px solid var(--hair); border-radius:22px; padding:20px; margin-bottom:18px; box-shadow:0 12px 28px -16px rgba(59,47,34,.3), inset 0 1px 0 rgba(255,255,255,.85);}
+  .program:after{content:""; position:absolute; top:-58px; right:-46px; width:180px; height:180px; border-radius:50%; background:radial-gradient(closest-side, rgba(198,141,138,.32), rgba(232,184,106,.12) 55%, transparent 72%); pointer-events:none;}
+  .program > *{position:relative; z-index:1;}
+  .program .pe{font-size:9px; letter-spacing:2.5px; color:var(--slate); font-weight:700; text-transform:uppercase;}
+  .program .pn{font-size:23px; font-weight:800; letter-spacing:-0.8px; color:var(--ink); margin-top:8px; line-height:1.05;}
+  .program .why{font-size:13px; color:var(--cocoaSoft); line-height:1.5; margin-top:12px;}
+  .program .prog{margin-top:18px;}
+  .program .prbar{height:7px; background:#E6DDCE; border-radius:100px; overflow:hidden; box-shadow:inset 0 1px 2px rgba(59,47,34,.16);}
+  .program .prbar i{display:block; height:100%; background:linear-gradient(90deg,#5A4632,#3B2F22); border-radius:100px; box-shadow:0 1px 2px rgba(59,47,34,.35), inset 0 1px 0 rgba(255,255,255,.12);}
+  .program .prmeta{display:flex; justify-content:space-between; margin-top:8px;}
+  .program .prmeta span{font-size:10px; letter-spacing:1.5px; font-weight:700; color:var(--clay); text-transform:uppercase;}
+  .program .prmeta b{color:var(--ink);}
+
+  .secLabel{font-size:9px; letter-spacing:2.5px; color:var(--clay); font-weight:700; text-transform:uppercase; margin:4px 0 12px;}
+
+  /* day card */
+  .dcard{border:0.5px solid var(--hair); border-radius:18px; margin-bottom:11px; overflow:hidden; background:#FFFFFF; box-shadow:0 4px 14px -7px rgba(59,47,34,.16), inset 0 1px 0 rgba(255,255,255,.7); transition:transform .2s, box-shadow .2s;}
+  .dcard:hover{transform:translateY(-1px); box-shadow:0 8px 20px -9px rgba(59,47,34,.2), inset 0 1px 0 rgba(255,255,255,.7);}
+  .dcard.todayCard{border-color:rgba(59,47,34,.42); background:linear-gradient(168deg,#FFFFFF, #FCF7EF); box-shadow:0 16px 32px -16px rgba(59,47,34,.42), inset 0 1px 0 rgba(255,255,255,.85);}
+  .dcard.rest{background:linear-gradient(168deg,#FCF8F2,#F6F0E6); border-style:dashed; border-color:var(--mist); box-shadow:inset 0 1px 0 rgba(255,255,255,.5);}
+  .dhead{display:flex; align-items:center; gap:14px; padding:15px 16px; cursor:pointer;}
+  .ddate{text-align:center; width:34px; flex-shrink:0;}
+  .ddate .w{font-size:9px; letter-spacing:1px; color:var(--clay); font-weight:700; text-transform:uppercase;}
+  .ddate .n{font-size:18px; font-weight:800; color:var(--ink); letter-spacing:-0.5px; margin-top:2px;}
+  .dmain{flex:1; min-width:0;}
+  .dtitle{font-size:16px; font-weight:700; color:var(--ink); letter-spacing:-0.3px;}
+  .dsub{font-size:11.5px; color:var(--clay); margin-top:3px; display:flex; align-items:center; gap:7px; flex-wrap:wrap;}
+  .pin{display:inline-flex; align-items:center; gap:5px; font-size:9px; letter-spacing:1.5px; font-weight:700; text-transform:uppercase;}
+  .pin .pd{width:6px; height:6px; border-radius:50%;}
+  .int-light .pd{background:var(--calm);} .int-light{color:var(--slate);}
+  .int-moderate .pd{background:var(--tan);} .int-moderate{color:var(--cocoaSoft);}
+  .int-hard .pd{background:var(--period);} .int-hard{color:var(--period);}
+  .int-rest .pd{background:var(--mist);} .int-rest{color:var(--clay);}
+  .dright{display:flex; align-items:center; gap:10px; flex-shrink:0;}
+  .chk{width:26px; height:26px; border-radius:50%; border:1.5px solid var(--mist); cursor:pointer; position:relative; flex-shrink:0; transition:all .2s; background:var(--screen);}
+  .chk.on{background:radial-gradient(120% 120% at 35% 25%,#B8C6AC,#94A684); border-color:#94A684; box-shadow:0 3px 8px -2px rgba(120,140,100,.5), inset 0 1px 0 rgba(255,255,255,.4);}
+  .chk.on:after{content:""; position:absolute; top:7px; left:6px; width:11px; height:6px; border-left:2px solid #fff; border-bottom:2px solid #fff; transform:rotate(-45deg);}
+  .caret{color:var(--clay); font-size:12px; transition:transform .25s;}
+  .dcard.open .caret{transform:rotate(180deg);}
+
+  .dbody{max-height:0; overflow:hidden; transition:max-height .3s ease;}
+  .dcard.open .dbody{max-height:900px;}
+  .dbody-inner{padding:2px 16px 16px; border-top:0.5px solid var(--hairLite);}
+  .sect{margin-top:14px;}
+  .sect .sh{font-size:9px; letter-spacing:2px; color:var(--slate); font-weight:700; text-transform:uppercase; margin-bottom:9px;}
+  .ex{display:flex; justify-content:space-between; align-items:baseline; padding:9px 0; border-bottom:0.5px solid var(--hairLite);}
+  .ex:last-child{border-bottom:none;}
+  .ex .en{font-size:14.5px; font-weight:500; color:var(--ink);}
+  .ex .ecue{font-size:11px; color:var(--clay); margin-top:2px;}
+  .ex .ev{font-size:13px; font-weight:700; color:var(--ink); letter-spacing:-0.2px; white-space:nowrap; padding-left:12px;}
+  .ev small{font-weight:500; color:var(--clay);}
+  .restnote{font-size:13px; color:var(--cocoaSoft); line-height:1.5; padding:0 0 2px;}
+
+  /* log view */
+  .logtop{display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;}
+  .logtop h2{font-size:26px; font-weight:800; letter-spacing:-1px; color:var(--ink); margin:0;}
+  .addbtn{width:42px; height:42px; border-radius:50%; background:radial-gradient(120% 120% at 30% 25%,#5A4632,#2C2117); border:none; color:var(--glaze); font-size:24px; cursor:pointer; display:flex; align-items:center; justify-content:center; line-height:1; box-shadow:0 6px 14px -4px rgba(59,47,34,.5), inset 0 1px 0 rgba(255,255,255,.18); transition:transform .15s;}
+  .addbtn:active{transform:scale(.93);}
+  .logcard{border-top:0.5px solid var(--hair); border-bottom:0.5px solid var(--hair); padding:15px 4px; margin-top:14px; display:flex; justify-content:space-between; align-items:flex-start; gap:12px;}
+  .logcard .lk{font-size:9px; letter-spacing:2px; color:var(--slate); font-weight:700; text-transform:uppercase;}
+  .logcard .ln{font-size:16px; font-weight:600; color:var(--ink); margin-top:5px;}
+  .logcard .ld{font-size:12px; color:var(--clay); margin-top:5px; line-height:1.4;}
+  .logcard .lr{text-align:right; flex-shrink:0;}
+  .logcard .lr .v{font-size:20px; font-weight:800; color:var(--ink); letter-spacing:-0.5px; line-height:1;}
+  .logcard .lr .vu{font-size:10px; color:var(--clay); margin-top:4px; letter-spacing:.5px;}
+  .src{display:inline-block; font-size:8.5px; letter-spacing:1.5px; font-weight:700; text-transform:uppercase; padding:3px 8px; border-radius:100px; margin-top:8px;}
+  .src.plan{background:var(--calmFill); color:var(--slate);} .src.manual{background:var(--cream); color:var(--cocoaSoft);}
+  .summary{position:relative; overflow:hidden; background:linear-gradient(162deg,#F6EFE4,#FCF8F1); border:0.5px solid var(--hair); border-radius:18px; padding:16px 18px; margin-top:20px; box-shadow:0 10px 24px -15px rgba(59,47,34,.28), inset 0 1px 0 rgba(255,255,255,.85);}
+  .summary:after{content:""; position:absolute; bottom:-50px; left:-30px; width:150px; height:150px; border-radius:50%; background:radial-gradient(closest-side, rgba(168,184,155,.3), transparent 72%); pointer-events:none;}
+  .summary > *{position:relative; z-index:1;}
+  .summary .st{font-size:9px; letter-spacing:2.5px; color:var(--slate); font-weight:700; text-transform:uppercase;}
+  .summary .sb{font-size:13px; color:var(--cocoaSoft); line-height:1.5; margin-top:8px;}
+
+  /* tab nav */
+  .tabnav{background:#fff; padding:9px 12px 22px; border-top:0.5px solid var(--hairLite); display:flex; justify-content:space-around; align-items:flex-end; flex-shrink:0;}
+  .tab{text-align:center; flex:1;}
+  .tab .ti{font-size:13px; line-height:1; color:var(--tan);}
+  .tab .tl{font-size:8px; letter-spacing:1px; margin-top:5px; font-weight:600; color:var(--clay); text-transform:uppercase;}
+  .tab.on .ti{color:var(--ink);} .tab.on .tl{color:var(--ink); letter-spacing:.8px;}
+
+  /* footer cta (plan create / regenerate) */
+  .planfoot{padding:6px 24px 0;}
+  .ghostbtn{width:100%; background:transparent; border:1.5px solid var(--ink); color:var(--ink); padding:13px; border-radius:100px; font-family:inherit; font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; cursor:pointer;}
+
+  /* ===== sheets ===== */
+  .scrim{position:absolute; inset:0; background:rgba(26,16,10,.38); opacity:0; pointer-events:none; transition:opacity .3s; z-index:20; border-radius:38px;}
+  .scrim.on{opacity:1; pointer-events:auto;}
+  .sheet{position:absolute; left:0; right:0; bottom:0; background:var(--glaze); border-radius:30px 30px 38px 38px; transform:translateY(102%); transition:transform .34s cubic-bezier(.3,.8,.3,1); z-index:21; max-height:92%; display:flex; flex-direction:column;}
+  .sheet.on{transform:translateY(0);}
+  .handle{display:flex; justify-content:center; padding:10px 0 0; flex-shrink:0;}
+  .handle i{width:38px; height:4px; background:var(--tan); border-radius:100px;}
+  .shead{padding:14px 22px 0; display:flex; justify-content:space-between; align-items:center; flex-shrink:0;}
+  .shead .st{font-weight:800; font-size:27px; color:var(--ink); letter-spacing:-1.2px;}
+  .shead .x{background:transparent; border:none; color:var(--clay); font-size:24px; cursor:pointer; line-height:1; padding:4px;}
+  .scon{overflow-y:auto; padding:6px 22px 20px;}
+  .scon::-webkit-scrollbar{width:0;}
+  .slabel{font-size:9px; letter-spacing:2px; color:var(--slate); font-weight:700; text-transform:uppercase; margin:20px 0 10px;}
+  .slabel .opt{color:var(--tan); letter-spacing:.5px; font-weight:500; text-transform:none; font-size:11px;}
+  .schips{display:flex; flex-wrap:wrap; gap:8px;}
+  .schip{border:0.5px solid var(--hair); background:transparent; border-radius:100px; padding:10px 15px; font-family:inherit; font-size:13px; font-weight:500; color:var(--ink); cursor:pointer; transition:all .15s;}
+  .schip:hover{border-color:var(--clay);}
+  .schip.on{background:var(--ink); border-color:var(--ink); color:var(--glaze);}
+  .sinput{width:100%; background:var(--creamTile); border:0.5px solid var(--hair); border-radius:12px; padding:13px 14px; font-family:inherit; font-size:14px; color:var(--ink); outline:none;}
+  .sinput::placeholder{color:var(--clay);}
+  .shint{font-size:11px; color:var(--clay); margin-top:8px; line-height:1.4;}
+  .sstepper{display:flex; align-items:center; gap:8px;}
+  .sstepper .sb{width:54px; height:52px; border-radius:14px; border:none; background:var(--creamTile); color:var(--ink); font-size:24px; font-weight:600; cursor:pointer;}
+  .sstepper .sb:active{background:var(--vapor);}
+  .sstepper .sval{flex:1; text-align:center; background:var(--creamTile); border-radius:14px; padding:14px 0; font-size:22px; font-weight:800; letter-spacing:-0.5px;}
+  .row3{display:flex; gap:10px;}
+  .row3 > div{flex:1;}
+  .seg2{background:var(--vapor); border-radius:13px; padding:4px; display:flex; gap:4px; margin-top:4px; box-shadow:inset 0 1px 3px rgba(59,47,34,.12);}
+  .seg2 button{flex:1; border:none; background:transparent; padding:11px 0; border-radius:10px; font-family:inherit; font-size:13px; font-weight:700; color:var(--slate); cursor:pointer; transition:all .15s;}
+  .seg2 button.on{background:linear-gradient(180deg,#FFFFFF,#FBF7F1); color:var(--ink); box-shadow:0 3px 8px -2px rgba(59,47,34,.2), inset 0 1px 0 rgba(255,255,255,.9);}
+  .scta{margin-top:24px;}
+  .scta button{width:100%; background:var(--ink); color:var(--glaze); border:none; padding:16px; border-radius:100px; font-family:inherit; font-size:12px; font-weight:700; letter-spacing:2.5px; text-transform:uppercase; cursor:pointer;}
+  .soutline{width:100%; background:transparent; border:1.5px solid var(--ink); color:var(--ink); padding:13px; border-radius:100px; font-family:inherit; font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; cursor:pointer; margin-top:12px; display:flex; align-items:center; justify-content:center; gap:8px;}
+  .sfoot{font-size:11px; color:var(--clay); text-align:center; line-height:1.5; margin-top:16px;}
+  .miniLabel{font-size:9px; letter-spacing:1.5px; color:var(--clay); font-weight:700; text-transform:uppercase; margin-bottom:6px;}
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="cap" style="opacity:.6;">Wren — Workout Tab Redesign · v1.2 · tap Plan/Log, tap a day, open + / Edit plan</div>
+  <div class="phone">
+    <div class="screen">
+      <div class="statusbar"><span>9:41</span><span class="d"><span>●●●</span><span>◗</span></span></div>
+      <div class="head">
+        <div>
+          <div class="eyebrow">Luteal · Day 26</div>
+          <h1>workout</h1>
+        </div>
+        <div class="avatar">TG</div>
+      </div>
+      <div class="toggle">
+        <button id="tgPlan" class="on" onclick="setView('plan')">Plan</button>
+        <button id="tgLog" onclick="setView('log')">Log</button>
+      </div>
+      <div class="strip" id="strip"></div>
+      <div class="body" id="body"></div>
+      <div class="planfoot" id="planfoot"></div>
+      <div class="tabnav">
+        <div class="tab"><div class="ti">○</div><div class="tl">Coach</div></div>
+        <div class="tab"><div class="ti">○</div><div class="tl">Food</div></div>
+        <div class="tab"><div class="ti">○</div><div class="tl">Cycle</div></div>
+        <div class="tab on"><div class="ti">●</div><div class="tl">Workout</div></div>
+        <div class="tab"><div class="ti">○</div><div class="tl">Progress</div></div>
+      </div>
+
+      <!-- sheets -->
+      <div class="scrim" id="scrim" onclick="closeSheet()"></div>
+      <div class="sheet" id="sheetBuild"></div>
+      <div class="sheet" id="sheetLog"></div>
+    </div>
+  </div>
+  <div class="cap" id="hint" style="opacity:.55;">Plan view</div>
+</div>
+
+<script>
+let view = 'plan';
+let openDay = 5; // today (Sun) open by default
+let logTab = 'strength';
+const done = {0:true,1:true,2:true,3:false,4:false,5:false}; // index into training days
+
+// week: Mon 25 .. Sun 31, luteal-aware
+const WEEK = [
+  {w:"Mon",n:25,kind:"strength",title:"Lower — glutes & hams",loc:"Gym",dur:45,int:"moderate",ti:0,
+    sections:[
+      {h:"Warm-up · 8 min",ex:[{n:"Glute bridge",v:"2 × 15"},{n:"Banded walk",v:"2 × 20"}]},
+      {h:"Main",ex:[
+        {n:"Hip thrust",v:"4 × 10",cue:"95 lb · 2s pause at top"},
+        {n:"Romanian deadlift",v:"3 × 10",cue:"65 lb · hinge, slow"},
+        {n:"Bulgarian split squat",v:"3 × 8",cue:"each leg"},
+        {n:"Cable kickback",v:"3 × 12"},
+      ]},
+    ]},
+  {w:"Tue",n:26,kind:"activity",title:"Lagree class",loc:"Studio",dur:50,int:"light",ti:1,activity:"Lagree",
+    note:"You booked this. Slow and controlled pairs well with where your energy is this week."},
+  {w:"Wed",n:27,kind:"strength",title:"Upper — back & shoulders",loc:"Gym",dur:45,int:"moderate",ti:2,
+    sections:[
+      {h:"Warm-up · 6 min",ex:[{n:"Band pull-apart",v:"2 × 20"},{n:"Scap pull-up",v:"2 × 8"}]},
+      {h:"Main",ex:[
+        {n:"Lat pulldown",v:"4 × 10",cue:"slow eccentric"},
+        {n:"DB shoulder press",v:"3 × 10",cue:"20 lb"},
+        {n:"Seated cable row",v:"3 × 12"},
+        {n:"Face pull",v:"3 × 15",cue:"light, high reps"},
+      ]},
+    ]},
+  {w:"Thu",n:28,kind:"rest",title:"Rest",int:"rest",
+    note:"Late-luteal dip is normal — your body is working harder at baseline. A gentle walk is plenty if you feel like moving."},
+  {w:"Fri",n:29,kind:"strength",title:"Full body — glute focus",loc:"Gym",dur:45,int:"moderate",ti:3,
+    sections:[
+      {h:"Main",ex:[
+        {n:"Goblet squat",v:"4 × 10"},
+        {n:"Single-leg RDL",v:"3 × 10",cue:"each leg"},
+        {n:"Hip thrust",v:"3 × 12",cue:"85 lb"},
+        {n:"Plank",v:"3 × 45 sec"},
+      ]},
+    ]},
+  {w:"Sat",n:30,kind:"activity",title:"Easy run or hike",loc:"Outdoor",dur:40,int:"light",ti:4,activity:"Run",
+    note:"Conversational pace. This is recovery cardio, not a push."},
+  {w:"Sun",n:31,kind:"activity",title:"Mobility + core",loc:"Home",dur:25,int:"light",ti:5,activity:"Mobility",today:true,
+    note:"Short and restorative to close the week. Hips, t-spine, and slow core."},
+];
+
+const TODAY_IDX = 5;
+function intLabel(i){return {light:"Light",moderate:"Moderate",hard:"Hard",rest:"Rest"}[i];}
+
+function renderStrip(){
+  document.getElementById('strip').innerHTML = WEEK.map((d,i)=>{
+    const trained = d.ti!=null && done[d.ti];
+    return `<div class="day ${i===TODAY_IDX?'today':''}">
+      <div class="dn">${d.w[0]}</div>
+      <div class="dd">${d.n}${trained?'<span class="trained"></span>':''}</div>
+    </div>`;
+  }).join("");
+}
+
+function trainingCount(){ return WEEK.filter(d=>d.ti!=null).length; }
+function doneCount(){ return Object.values(done).filter(Boolean).length; }
+
+function planView(){
+  const total = trainingCount(), dn = doneCount();
+  let html = `
+    <div class="program">
+      <div class="pe">Your plan · Week 3 of this block</div>
+      <div class="pn">Luteal Strength</div>
+      <div class="why">This week leans into steady strength over peak intensity — your luteal phase favors endurance and control. Slightly more rest, a little extra protein and magnesium, and we ease volume toward the weekend.</div>
+      <div class="prog">
+        <div class="prbar"><i style="width:${(dn/total)*100}%"></i></div>
+        <div class="prmeta"><span><b>${dn}</b> of ${total} sessions done</span><span>${total-dn} to go</span></div>
+      </div>
+    </div>
+    <div class="secLabel">This week · Mon–Sun</div>`;
+
+  WEEK.forEach((d,i)=>{
+    const isToday = i===TODAY_IDX;
+    const open = openDay===i && d.kind!=='rest';
+    const checked = d.ti!=null && done[d.ti];
+    if(d.kind==='rest'){
+      html += `<div class="dcard rest ${isToday?'todayCard':''}">
+        <div class="dhead" style="cursor:default;">
+          <div class="ddate"><div class="w">${d.w}</div><div class="n">${d.n}</div></div>
+          <div class="dmain">
+            <div class="dtitle">Rest day</div>
+            <div class="dsub"><span class="pin int-rest"><span class="pd"></span>Recovery</span></div>
+          </div>
+        </div>
+        <div class="dbody-inner" style="border-top:0.5px solid var(--hairLite); padding-top:12px;"><div class="restnote">${d.note}</div></div>
+      </div>`;
+      return;
+    }
+    html += `<div class="dcard ${open?'open':''} ${isToday?'todayCard':''}">
+      <div class="dhead" onclick="toggleDay(${i})">
+        <div class="ddate"><div class="w">${d.w}</div><div class="n">${d.n}</div></div>
+        <div class="dmain">
+          <div class="dtitle">${d.title}</div>
+          <div class="dsub">
+            <span class="pin int-${d.int}"><span class="pd"></span>${intLabel(d.int)}</span>
+            <span>·</span><span>${d.loc} · ${d.dur} min</span>
+          </div>
+        </div>
+        <div class="dright">
+          <div class="chk ${checked?'on':''}" onclick="event.stopPropagation();toggleDone(${d.ti})"></div>
+          <span class="caret">▾</span>
+        </div>
+      </div>
+      <div class="dbody"><div class="dbody-inner">
+        ${d.sections ? d.sections.map(s=>`
+          <div class="sect"><div class="sh">${s.h}</div>
+            ${s.ex.map(e=>`<div class="ex"><div><div class="en">${e.n}</div>${e.cue?`<div class="ecue">${e.cue}</div>`:''}</div><div class="ev">${e.v}</div></div>`).join("")}
+          </div>`).join("")
+        : `<div class="sect"><div class="sh">${d.activity} · ${d.dur} min</div><div class="restnote">${d.note||''}</div></div>`}
+      </div></div>
+    </div>`;
+  });
+  return html;
+}
+
+function logView(){
+  return `
+    <div class="logtop">
+      <h2>Today</h2>
+      <button class="addbtn" onclick="openSheet('log')">+</button>
+    </div>
+    <div style="font-size:13px; color:var(--clay); margin-top:2px;">Sunday, May 31 · Luteal</div>
+
+    <div class="logcard">
+      <div>
+        <div class="lk">Logged · Strength</div>
+        <div class="ln">Mobility + core</div>
+        <div class="ld">8 movements · hips, t-spine, slow core</div>
+        <span class="src plan">From your plan</span>
+      </div>
+      <div class="lr"><div class="v">25</div><div class="vu">MIN</div></div>
+    </div>
+
+    <div class="logcard">
+      <div>
+        <div class="lk">Logged · Activity</div>
+        <div class="ln">Morning walk</div>
+        <div class="ld">Easy pace · 2.1 mi · felt good</div>
+        <span class="src manual">Added manually</span>
+      </div>
+      <div class="lr"><div class="v">182</div><div class="vu">KCAL · 32 MIN</div></div>
+    </div>
+
+    <div class="summary">
+      <div class="st">This week so far</div>
+      <div class="sb">3 of 6 sessions done, plus 2 walks. You're ahead on movement and right on plan — Friday's full-body is the one left that matters most.</div>
+    </div>`;
+}
+
+function render(){
+  renderStrip();
+  const b = document.getElementById('body');
+  b.className = 'body';
+  b.innerHTML = `<div class="enter">${view==='plan'?planView():logView()}</div>`;
+  document.getElementById('tgPlan').classList.toggle('on', view==='plan');
+  document.getElementById('tgLog').classList.toggle('on', view==='log');
+  document.getElementById('planfoot').innerHTML = view==='plan'
+    ? `<button class="ghostbtn" onclick="openSheet('build')">Edit / regenerate plan</button>` : '';
+  document.getElementById('hint').textContent = view==='plan' ? 'Plan view — tap a day to expand' : 'Log view';
+}
+
+function setView(v){ view=v; render(); }
+function toggleDay(i){ openDay = (openDay===i?-1:i); render(); }
+function toggleDone(ti){ done[ti]=!done[ti]; render(); }
+
+/* ===== sheets ===== */
+function openSheet(which){
+  document.getElementById('scrim').classList.add('on');
+  if(which==='build'){ document.getElementById('sheetBuild').innerHTML = buildSheet(); document.getElementById('sheetBuild').classList.add('on'); }
+  else { document.getElementById('sheetLog').innerHTML = logSheet(); document.getElementById('sheetLog').classList.add('on'); }
+}
+function closeSheet(){
+  document.getElementById('scrim').classList.remove('on');
+  document.getElementById('sheetBuild').classList.remove('on');
+  document.getElementById('sheetLog').classList.remove('on');
+}
+
+// build sheet state
+const buildState = { days:new Set(["Mon","Tue","Wed","Fri","Sat","Sun"]), mins:45, where:new Set(["Gym","Home"]), exp:"intermediate" };
+function toggleBuildDay(d){ buildState.days.has(d)?buildState.days.delete(d):buildState.days.add(d); refreshBuild(); }
+function toggleWhere(w){ buildState.where.has(w)?buildState.where.delete(w):buildState.where.add(w); refreshBuild(); }
+function setExp(e){ buildState.exp=e; refreshBuild(); }
+function stepMins(d){ buildState.mins=Math.max(15,Math.min(120,buildState.mins+d*5)); refreshBuild(); }
+function refreshBuild(){ document.getElementById('sheetBuild').innerHTML = buildSheet(); }
+
+function buildSheet(){
+  const DAYS=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+  const WHERE=["Gym","Home","Classes"];
+  const EXP=[["beginner","Beginner"],["intermediate","Intermediate"],["advanced","Advanced"]];
+  return `
+    <div class="handle"><i></i></div>
+    <div class="shead"><span class="st">build your plan</span><button class="x" onclick="closeSheet()">×</button></div>
+    <div class="scon">
+      <div class="slabel">Training days</div>
+      <div class="schips">${DAYS.map(d=>`<button class="schip ${buildState.days.has(d)?'on':''}" onclick="toggleBuildDay('${d}')">${d}</button>`).join("")}</div>
+      <div class="shint">The days you don't pick become rest days. Your Coach still adjusts intensity to your cycle.</div>
+
+      <div class="slabel">Time per session</div>
+      <div class="sstepper">
+        <button class="sb" onclick="stepMins(-1)">−</button>
+        <div class="sval">${buildState.mins} min</div>
+        <button class="sb" onclick="stepMins(1)">+</button>
+      </div>
+
+      <div class="slabel">Where you train</div>
+      <div class="schips">${WHERE.map(w=>`<button class="schip ${buildState.where.has(w)?'on':''}" onclick="toggleWhere('${w}')">${w}</button>`).join("")}</div>
+
+      <div class="slabel">Equipment <span class="opt">(optional)</span></div>
+      <input class="sinput" placeholder="Dumbbells, bands, full gym…">
+
+      <div class="slabel">Classes you do <span class="opt">(optional)</span></div>
+      <input class="sinput" placeholder="Lagree Tue/Sat, F45 Thu…">
+
+      <div class="slabel">Experience</div>
+      <div class="schips">${EXP.map(([k,l])=>`<button class="schip ${buildState.exp===k?'on':''}" onclick="setExp('${k}')">${l}</button>`).join("")}</div>
+
+      <div class="slabel">Injuries or limits <span class="opt">(optional)</span></div>
+      <input class="sinput" placeholder="Sensitive left knee, avoid jumping…">
+
+      <div class="scta"><button onclick="closeSheet()">Generate my plan</button></div>
+      <div class="sfoot">Your Coach builds this from your goal, your cycle phase, and the answers above. Regenerate anytime — nothing is locked in.</div>
+    </div>`;
+}
+
+function setLogTab(t){ logTab=t; document.getElementById('sheetLog').innerHTML = logSheet(); }
+function logSheet(){
+  const ACTS=["Run","Walk","Cycling","Spin","Yoga","Pilates","Lagree","Boxing","HIIT","Swim","Hike","Dance"];
+  const strength = `
+      <div class="slabel">Exercise</div>
+      <input class="sinput" placeholder="e.g. Hip thrust">
+      <div class="row3" style="margin-top:12px;">
+        <div><div class="miniLabel">Sets</div><input class="sinput" value="3"></div>
+        <div><div class="miniLabel">Reps</div><input class="sinput" value="10"></div>
+        <div><div class="miniLabel">Weight (lb)</div><input class="sinput" placeholder="—"></div>
+      </div>
+      <button class="soutline">+ Add exercise</button>
+      <div class="slabel">Duration <span class="opt">(optional)</span></div>
+      <input class="sinput" placeholder="Minutes — for calorie estimate">`;
+  const activity = `
+      <div class="slabel">Activity</div>
+      <input class="sinput" placeholder="e.g. Pilates, Run, Boxing">
+      <div class="schips" style="margin-top:12px;">${ACTS.map(a=>`<button class="schip" onclick="this.classList.toggle('on')">${a}</button>`).join("")}</div>
+      <div class="row3" style="margin-top:16px;">
+        <div><div class="miniLabel">Duration (min)</div><input class="sinput" placeholder="e.g. 45"></div>
+        <div><div class="miniLabel">Distance (opt)</div><input class="sinput" placeholder="e.g. 2 mi"></div>
+      </div>`;
+  return `
+    <div class="handle"><i></i></div>
+    <div class="shead"><span class="st">log a workout</span><button class="x" onclick="closeSheet()">×</button></div>
+    <div class="scon">
+      <div class="seg2">
+        <button class="${logTab==='strength'?'on':''}" onclick="setLogTab('strength')">Strength</button>
+        <button class="${logTab==='activity'?'on':''}" onclick="setLogTab('activity')">Activity</button>
+      </div>
+      ${logTab==='strength'?strength:activity}
+
+      <div class="slabel">From your watch <span class="opt">(optional)</span></div>
+      <div class="row3">
+        <div><div class="miniLabel">Calories</div><input class="sinput" placeholder="—"></div>
+        <div><div class="miniLabel">Avg HR</div><input class="sinput" placeholder="—"></div>
+        <div><div class="miniLabel">Max HR</div><input class="sinput" placeholder="—"></div>
+      </div>
+      <div class="shint">Leave blank and your Coach estimates calories from your stats and duration.</div>
+
+      <div class="slabel">Note <span class="opt">(optional)</span></div>
+      <input class="sinput" placeholder="How it felt, energy, anything to remember…">
+
+      <div class="scta"><button onclick="closeSheet()">Save workout</button></div>
+    </div>`;
+}
+
+render();
+</script>
+</body>
+</html>

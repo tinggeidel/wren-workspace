@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img">
+  <title>Wren symbol mark</title>
+  <desc>Abstract symbol mark derived from the terminal of an italic serif: a soft teardrop-comma form rotated to suggest flow and rhythm. Drawn in cocoa on a cream field.</desc>
+  <rect x="0" y="0" width="400" height="400" fill="#FBF7F0"/>
+  <g transform="translate(200 200) rotate(-22)">
+    <path d="
+      M 0 -110
+      C 62 -110, 102 -68, 102 -10
+      C 102 38, 78 70, 42 86
+      C 12 100, -8 116, -22 142
+      C -36 168, -42 190, -42 190
+      C -42 190, -68 168, -82 130
+      C -96 92, -100 50, -90 8
+      C -78 -42, -50 -82, -22 -98
+      C -14 -103, -7 -107, 0 -110
+      Z" fill="#3B2F22"/>
+  </g>
+</svg>

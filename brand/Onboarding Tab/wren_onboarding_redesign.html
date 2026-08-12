@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wren — Onboarding Redesign</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/manrope@5.2.5/400.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/manrope@5.2.5/500.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/manrope@5.2.5/600.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/manrope@5.2.5/700.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/manrope@5.2.5/800.css">
+<style>
+  :root{
+    --backdrop:#EFE7DA; --frame:#15100C; --screen:#FCFAF5;
+    --glaze:#FBF7F0; --cream:#F4EDE2; --butter:#F1E3C9; --vapor:#E3E8E9;
+    --ink:#3B2F22; --ink2:#5A4B3A; --clay:#8A7B68; --cocoaSoft:#6B5641;
+    --period:#B4564B; --mist:#D6CFC2; --calm:#7E9AA0; --calmFill:#DCE5E4;
+    --sage:#A8B89B; --tan:#C8A989; --slate:#4F6B70; --honey:#E8B86A; --rose:#D4A89E;
+    --hair:rgba(59,47,34,0.10); --hairStr:rgba(59,47,34,0.16); --hairLite:rgba(59,47,34,0.06);
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0; padding:0;}
+  body{background:var(--backdrop); font-family:'Manrope',system-ui,sans-serif; color:var(--ink); overflow-x:hidden;}
+
+  /* ---- ambient warm mesh + grain ---- */
+  .bg{position:fixed; inset:-30%; z-index:0; pointer-events:none;
+    background:
+      radial-gradient(38% 34% at 18% 12%, rgba(241,227,201,.95), transparent 70%),
+      radial-gradient(42% 38% at 88% 8%,  rgba(227,232,233,.85), transparent 70%),
+      radial-gradient(48% 44% at 82% 88%, rgba(212,168,158,.55), transparent 72%),
+      radial-gradient(46% 46% at 8% 92%,  rgba(168,184,155,.42), transparent 72%),
+      radial-gradient(40% 40% at 50% 50%, rgba(232,184,106,.18), transparent 70%);
+    animation:drift 24s ease-in-out infinite alternate; filter:saturate(1.05);}
+  .grain{position:fixed; inset:0; z-index:1; pointer-events:none; opacity:.045; mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+  @keyframes drift{0%{transform:translate3d(0,0,0) rotate(0deg) scale(1);}100%{transform:translate3d(2.5%,-2%,0) rotate(4deg) scale(1.08);}}
+
+  .stage{position:relative; z-index:2; min-height:100vh; display:flex; flex-direction:column; align-items:center; gap:16px; padding:30px 0 50px;}
+  .cap{font-size:11px; letter-spacing:2.5px; color:var(--clay); font-weight:600; text-transform:uppercase;}
+
+  /* ---- phone ---- */
+  .phone{width:366px; background:linear-gradient(160deg,#221a13,#15100C 60%); border-radius:50px; padding:11px;
+    box-shadow:0 40px 90px -20px rgba(40,28,16,.55), 0 0 0 1px rgba(255,255,255,.04) inset;}
+  .screen{background:var(--screen); border-radius:40px; overflow:hidden; height:780px; position:relative; display:flex; flex-direction:column;
+    box-shadow:0 0 0 1px rgba(59,47,34,.06) inset;}
+  .screen:before{content:""; position:absolute; inset:0; z-index:5; pointer-events:none; border-radius:40px;
+    background:linear-gradient(155deg, rgba(255,255,255,.35), transparent 30%);}
+
+  .statusbar{display:flex; justify-content:space-between; align-items:center; padding:16px 28px 4px; font-size:13px; color:var(--ink); font-weight:600; flex-shrink:0; z-index:6;}
+  .statusbar .d{display:flex; gap:5px; align-items:center; font-size:11px;}
+
+  /* ---- editorial index progress ---- */
+  .index{display:flex; align-items:center; gap:12px; padding:10px 28px 16px; flex-shrink:0; z-index:6;}
+  .index .num{font-size:10px; letter-spacing:2.5px; color:var(--ink); font-weight:700; white-space:nowrap;}
+  .index .num b{color:var(--clay); font-weight:600;}
+  .index .rule{flex:1; height:1.5px; background:var(--mist); border-radius:2px; overflow:hidden;}
+  .index .rule i{display:block; height:100%; background:var(--ink); border-radius:2px; transition:width .6s cubic-bezier(.4,0,.1,1);}
+
+  .body{flex:1; overflow-y:auto; padding:4px 28px 10px; z-index:6;}
+  .body::-webkit-scrollbar{width:0;}
+
+  /* staggered entrance */
+  .enter > *{opacity:0; transform:translateY(14px); animation:rise .6s cubic-bezier(.2,.8,.2,1) forwards;}
+  .enter > *:nth-child(1){animation-delay:.02s} .enter > *:nth-child(2){animation-delay:.08s}
+  .enter > *:nth-child(3){animation-delay:.14s} .enter > *:nth-child(4){animation-delay:.20s}
+  .enter > *:nth-child(5){animation-delay:.26s} .enter > *:nth-child(6){animation-delay:.32s}
+  .enter > *:nth-child(7){animation-delay:.38s} .enter > *:nth-child(8){animation-delay:.44s}
+  @keyframes rise{to{opacity:1; transform:none;}}
+
+  .eyebrow{font-size:9px; letter-spacing:4px; color:var(--clay); font-weight:700; text-transform:uppercase;}
+  h1.title{font-family:'Manrope'; font-weight:800; font-size:42px; color:var(--ink); line-height:.98; letter-spacing:-2px; margin:14px 0 0;}
+  h1.title.sm{font-size:36px;}
+  .sub{font-size:15px; color:var(--ink2); line-height:1.5; margin:16px 0 0; font-weight:400; max-width:90%;}
+  .micro{font-size:11.5px; color:var(--clay); line-height:1.5; margin-top:16px;}
+  .label{font-size:10px; letter-spacing:2.5px; color:var(--slate); font-weight:700; text-transform:uppercase; margin:28px 0 12px;}
+  .label .opt{color:var(--tan); letter-spacing:.5px; font-weight:500; text-transform:none; font-size:11px;}
+
+  /* underline text field */
+  .uline{width:100%; background:transparent; border:none; border-bottom:1.5px solid var(--mist); padding:8px 2px 12px; font-family:inherit; font-size:26px; font-weight:700; letter-spacing:-1px; color:var(--ink); outline:none; transition:border-color .2s;}
+  .uline::placeholder{color:var(--mist); font-weight:700;}
+  .uline:focus{border-color:var(--ink);}
+
+  textarea.field{width:100%; background:var(--glaze); border:0.5px solid var(--hair); border-radius:16px; padding:14px 15px; font-family:inherit; font-size:14.5px; color:var(--ink); outline:none; resize:none; min-height:74px; line-height:1.45;}
+  textarea.field::placeholder{color:var(--clay);}
+
+  /* editorial selectable rows */
+  .rows{margin-top:6px; border-top:0.5px solid var(--hair);}
+  .row{display:flex; align-items:center; gap:14px; padding:16px 4px; border-bottom:0.5px solid var(--hair); cursor:pointer; transition:padding .2s;}
+  .row:hover{padding-left:8px;}
+  .row .rtext{flex:1;}
+  .row .rt{font-size:16.5px; font-weight:600; color:var(--ink); letter-spacing:-0.3px; transition:color .2s;}
+  .row .rd{font-size:12px; color:var(--clay); line-height:1.4; margin-top:3px;}
+  .row .mark{width:22px; height:22px; border-radius:50%; border:1.5px solid var(--mist); flex-shrink:0; position:relative; transition:all .2s;}
+  .row.on .mark{border-color:var(--ink); background:var(--ink);}
+  .row.on .mark:after{content:""; position:absolute; top:6px; left:6px; width:8px; height:8px; border-radius:50%; background:var(--screen);}
+  .row.on .rt{color:var(--ink);}
+  .row .idx{font-size:10px; letter-spacing:1.5px; color:var(--tan); font-weight:700; width:22px;}
+
+  /* chips (food prefs) */
+  .chips{display:flex; flex-wrap:wrap; gap:9px; margin-top:2px;}
+  .chip{border:1px solid var(--mist); background:var(--glaze); border-radius:100px; padding:11px 17px; font-size:13.5px; color:var(--ink); font-weight:500; cursor:pointer; transition:all .18s;}
+  .chip:hover{border-color:var(--clay);}
+  .chip.on{background:var(--ink); border-color:var(--ink); color:var(--glaze); transform:translateY(-1px);}
+
+  /* tappable value row (DOB / date) */
+  .vrow{display:flex; justify-content:space-between; align-items:center; background:var(--glaze); border:0.5px solid var(--hair); border-radius:16px; padding:16px; cursor:pointer; transition:border-color .2s;}
+  .vrow:hover{border-color:var(--clay);}
+  .vrow .vv{font-size:15px; font-weight:600;}
+
+  /* stepper */
+  .stepper{display:flex; align-items:center; justify-content:space-between; background:var(--glaze); border:0.5px solid var(--hair); border-radius:18px; padding:10px;}
+  .stepper.dim .sv{color:var(--clay);}
+  .sbtn{width:46px; height:46px; border-radius:50%; border:1px solid var(--mist); background:var(--screen); color:var(--ink); font-size:24px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; line-height:1; transition:all .15s;}
+  .sbtn:hover{border-color:var(--ink);} .sbtn:active{background:var(--vapor); transform:scale(.94);}
+  .sv{font-size:24px; font-weight:800; letter-spacing:-1px; color:var(--ink);}
+  .sv small{font-size:14px; font-weight:600; color:var(--clay); letter-spacing:0;}
+
+  /* switch */
+  .switchrow{display:flex; align-items:center; justify-content:space-between; gap:14px; margin-top:6px;}
+  .switch{width:52px; height:31px; border-radius:100px; background:var(--mist); position:relative; cursor:pointer; flex-shrink:0; transition:background .25s;}
+  .switch.on{background:var(--ink);}
+  .knob{position:absolute; top:3px; left:3px; width:25px; height:25px; border-radius:50%; background:#fff; transition:left .25s cubic-bezier(.4,0,.1,1); box-shadow:0 1px 4px rgba(0,0,0,.25);}
+  .switch.on .knob{left:24px;}
+
+  /* photo cards */
+  .photo-row{display:flex; gap:11px; margin-top:4px;}
+  .pslot{flex:1; border:1.5px dashed var(--mist); background:var(--glaze); border-radius:18px; aspect-ratio:3/4; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:9px; cursor:pointer; transition:all .2s;}
+  .pslot:hover{border-color:var(--clay); transform:translateY(-2px);}
+  .pslot.on{border-style:solid; border-color:var(--calm); background:linear-gradient(160deg,var(--calmFill),var(--glaze));}
+  .pslot .pls{width:34px; height:34px; border-radius:50%; border:1.5px solid var(--clay); display:flex; align-items:center; justify-content:center; font-size:18px; color:var(--clay); font-weight:400;}
+  .pslot.on .pls{border-color:var(--calm); color:var(--calm);}
+  .pslot .pl{font-size:9.5px; letter-spacing:2px; color:var(--clay); font-weight:700; text-transform:uppercase;}
+  .pslot.on .pl{color:var(--slate);}
+
+  /* info / contract card */
+  .infocard{background:linear-gradient(165deg,var(--cream),var(--glaze)); border:0.5px solid var(--hair); border-radius:20px; padding:18px 20px; margin-top:20px;}
+  .infocard .ict{font-size:9.5px; letter-spacing:2.5px; color:var(--slate); font-weight:700; text-transform:uppercase;}
+  .infocard .icb{font-size:12.5px; color:var(--cocoaSoft); line-height:1.55; margin-top:9px;}
+
+  /* ---- signature orb ---- */
+  .orb-wrap{display:flex; flex-direction:column; align-items:center;}
+  .orb{width:128px; height:128px; position:relative; border-radius:46% 54% 56% 44% / 44% 46% 54% 56%;
+    background:conic-gradient(from 30deg, #F1E3C9, #D4A89E, #E3E8E9, #A8B89B, #C8A989, #F1E3C9);
+    box-shadow:0 18px 50px -12px rgba(180,120,80,.5), inset 0 0 30px rgba(255,255,255,.4);
+    animation:morph 9s ease-in-out infinite, spin 22s linear infinite; filter:blur(.4px);}
+  .orb.sm{width:64px; height:64px;}
+  .orb-glow{position:absolute; inset:-22px; border-radius:50%; background:radial-gradient(closest-side, rgba(232,184,106,.35), transparent 75%); animation:breathe 5s ease-in-out infinite; z-index:-1;}
+  @keyframes morph{0%,100%{border-radius:46% 54% 56% 44%/44% 46% 54% 56%;}50%{border-radius:56% 44% 42% 58%/52% 56% 44% 48%;}}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  @keyframes breathe{0%,100%{transform:scale(1); opacity:.8;}50%{transform:scale(1.12); opacity:1;}}
+
+  .wordmark{font-weight:800; font-size:58px; color:var(--ink); letter-spacing:-3px; line-height:1;}
+  .tagline{font-size:10px; letter-spacing:6px; color:var(--clay); font-weight:700; text-transform:uppercase; margin-top:16px;}
+
+  /* hero */
+  .hero{flex:1; display:flex; flex-direction:column;}
+  .hero-lede{font-size:24px; font-weight:800; color:var(--ink); line-height:1.12; letter-spacing:-1.2px;}
+  .hero-sub{font-size:14.5px; color:var(--ink2); line-height:1.55; margin-top:16px;}
+
+  /* how-it-works mini list */
+  .hiw{margin-top:20px; border-top:0.5px solid var(--hair);}
+  .hiw .it{display:flex; gap:13px; align-items:flex-start; padding:14px 2px; border-bottom:0.5px solid var(--hair);}
+  .hiw .it .n{font-size:9px; letter-spacing:1.5px; color:var(--tan); font-weight:700; margin-top:3px;}
+  .hiw .it .t{font-size:14px; color:var(--ink); font-weight:500; line-height:1.4;}
+  .hiw .it .t b{font-weight:700;}
+
+  .note{font-size:11px; color:var(--tan); margin-top:18px;}
+
+  /* coach reveal */
+  .coachhead{display:flex; align-items:center; gap:10px; margin:20px 0 10px;}
+  .coachhead .pill{background:var(--vapor); padding:5px 11px; border-radius:100px; font-weight:800; font-size:11px; color:var(--ink); letter-spacing:-0.3px;}
+  .coachhead .meta{font-size:9px; letter-spacing:2.5px; color:var(--slate); font-weight:700;}
+  .bubble{background:var(--vapor); color:var(--ink); padding:15px 17px; border-radius:22px 22px 22px 7px; font-size:14.5px; line-height:1.55;}
+
+  /* choice cards */
+  .choice{border:1px solid var(--mist); border-radius:20px; padding:18px; margin-top:13px; cursor:pointer; transition:all .2s; background:var(--glaze); display:flex; align-items:flex-start; gap:14px;}
+  .choice:hover{border-color:var(--clay);}
+  .choice.on{border-color:var(--ink); background:linear-gradient(165deg,var(--cream),var(--glaze));}
+  .choice .ctext{flex:1;}
+  .choice .ct{font-size:16px; font-weight:700; color:var(--ink);}
+  .choice .cd{font-size:12.5px; color:var(--cocoaSoft); line-height:1.5; margin-top:6px;}
+  .choice .mark{width:22px; height:22px; border-radius:50%; border:1.5px solid var(--mist); flex-shrink:0; position:relative; margin-top:2px;}
+  .choice.on .mark{border-color:var(--ink); background:var(--ink);}
+  .choice.on .mark:after{content:""; position:absolute; top:6px; left:6px; width:8px; height:8px; border-radius:50%; background:var(--screen);}
+
+  /* footer */
+  .footer{flex-shrink:0; display:flex; align-items:center; gap:10px; padding:14px 26px 28px; border-top:0.5px solid var(--hairLite); background:rgba(252,250,245,.85); backdrop-filter:blur(6px); z-index:6;}
+  .back{background:transparent; border:none; color:var(--clay); font-family:inherit; font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; cursor:pointer; padding:15px 6px;}
+  .skip{background:transparent; border:none; color:var(--clay); font-family:inherit; font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; cursor:pointer; padding:15px 6px;}
+  .next{flex:1; position:relative; overflow:hidden; background:var(--ink); color:var(--glaze); border:none; padding:17px; border-radius:100px; font-family:inherit; font-size:11.5px; font-weight:700; letter-spacing:2.5px; text-transform:uppercase; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px; transition:transform .15s;}
+  .next:hover{transform:translateY(-1px);} .next:active{transform:translateY(0);}
+  .next .arr{width:15px; height:15px;}
+  .next.ghost{background:transparent; border:1.5px solid var(--ink); color:var(--ink);}
+  .next:before{content:""; position:absolute; top:0; left:-60%; width:40%; height:100%; background:linear-gradient(100deg,transparent,rgba(255,255,255,.18),transparent); transform:skewX(-18deg); animation:sheen 4.5s ease-in-out infinite;}
+  @keyframes sheen{0%,60%{left:-60%;}80%,100%{left:130%;}}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="grain"></div>
+
+<div class="stage">
+  <div class="cap" style="opacity:.65;">Wren — Onboarding Redesign · v1.2 · tap through</div>
+  <div class="phone">
+    <div class="screen">
+      <div class="statusbar">
+        <span>9:41</span>
+        <span class="d"><span>●●●</span><span>◗</span></span>
+      </div>
+      <div class="index" id="index"></div>
+      <div class="body" id="screenBody"></div>
+      <div class="footer" id="footer"></div>
+    </div>
+  </div>
+  <div class="cap" id="stepName" style="opacity:.55;"></div>
+</div>
+
+<script>
+const TOTAL = 9;
+let step = 0;
+
+const state = {
+  name:"", goal:"feel_better", personalGoals:"",
+  age:null, height:null, weight:null, activity:"light",
+  pFront:false, pSide:false, pGoal:false,
+  onBC:false, lastPeriod:"", cycleLen:"28",
+  diet:new Set(), notes:"",
+  tone:"bestie", dest:"workout",
+};
+
+const GOALS = [
+  ["lose_fat","Lean out","Lower body fat at a steady, sustainable pace"],
+  ["tone_up","Tone & define","Recomposition — hold weight, build shape"],
+  ["build_muscle","Build strength","Add muscle and get measurably stronger"],
+  ["feel_better","Feel better","More energy and consistency, less guesswork"],
+  ["maintain","Maintain","Hold your current shape with structure"],
+];
+const ACTIVITY = [
+  ["sedentary","Mostly seated","Desk job, little daily movement"],
+  ["light","Lightly active","On my feet some, train 1–2x/week"],
+  ["active","Active","Train 3–4x/week, move daily"],
+  ["very_active","Very active","Train 5+ x/week or physical job"],
+];
+const DIET = [["vegetarian","Vegetarian"],["vegan","Vegan"],["pescatarian","Pescatarian"],["dairy_free","Dairy-free"],["gluten_free","Gluten-free"],["nut_free","Nut-free"]];
+const TONES = [
+  ["bestie","Knowledgeable friend","Calm and warm — your trainer who happens to be in your corner. Holds you to the plan without the edge."],
+  ["tough_love","Tough love","Direct and demanding. Names the misses, expects the work, never cruel."],
+  ["hype","Hype","High energy. Big on momentum and marking the wins as you stack them."],
+];
+
+function fmtHeight(t){ return Math.floor(t/12)+"'"+(t%12)+'"'; }
+const ARROW = `<svg class="arr" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+function screens(){ return [
+  // 0 — WELCOME
+  () => `
+    <div class="hero">
+      <div style="margin-top:48px;">
+        <div class="wordmark">wren</div>
+        <div class="tagline">A softer science</div>
+      </div>
+      <p class="hero-lede" style="margin-top:36px;">A structured coach<br>that holds you to it.</p>
+      <p class="hero-sub">Your trainer and nutritionist in one — Wren builds the plan around your body and your cycle, then keeps you accountable to it, day after day.</p>
+      <div class="hiw">
+        <div class="it"><span class="n">01</span><span class="t"><b>A daily plan</b> for food and training, set for you — not left to willpower.</span></div>
+        <div class="it"><span class="n">02</span><span class="t"><b>Real check-ins</b> that keep you honest and adjust when life moves.</span></div>
+        <div class="it"><span class="n">03</span><span class="t"><b>Cycle-aware</b> — intensity and fuel tuned to where you are.</span></div>
+      </div>
+      <p class="note">A few quick questions so your Coach can build your plan. Everything stays on your device.</p>
+    </div>`,
+
+  // 1 — NAME
+  () => `
+    <div class="eyebrow">Step 01 — The basics</div>
+    <h1 class="title">What should<br>I call you?</h1>
+    <p class="sub">So your Coach speaks to you directly — by name, every day.</p>
+    <div class="label">Your name</div>
+    <input class="uline" id="f_name" placeholder="First name" value="${esc(state.name)}" oninput="state.name=this.value">
+    <p class="micro">You can change this anytime in Settings.</p>`,
+
+  // 2 — GOAL
+  () => `
+    <div class="eyebrow">Step 02 — Your goal</div>
+    <h1 class="title">What are we<br>working toward?</h1>
+    <p class="sub">This is the spine of your plan — your Coach builds training and targets around it.</p>
+    <div class="rows" style="margin-top:18px;">
+      ${GOALS.map(([k,t,d],i)=>`
+        <div class="row ${state.goal===k?'on':''}" onclick="state.goal='${k}';render()">
+          <span class="idx">0${i+1}</span>
+          <span class="rtext"><span class="rt">${t}</span><span class="rd">${d}</span></span>
+          <span class="mark"></span>
+        </div>`).join("")}
+    </div>
+    <div class="label">In your words <span class="opt">(optional)</span></div>
+    <textarea class="field" id="f_pg" placeholder="Snatched waist, stronger glutes, steady energy through my afternoons…" oninput="state.personalGoals=this.value">${esc(state.personalGoals)}</textarea>`,
+
+  // 3 — BODY
+  () => `
+    <div class="eyebrow">Step 03 — A bit about you</div>
+    <h1 class="title sm">The numbers<br>behind your targets.</h1>
+    <p class="sub">Your Coach uses these to set accurate daily targets. Optional — it can ask later.</p>
+
+    <div class="label">Date of birth</div>
+    <div class="vrow" onclick="bumpAge()">
+      <span class="vv" style="color:${state.age?'var(--ink)':'var(--clay)'}">${state.age? ('Age '+state.age) : 'Choose your birth date'}</span>
+      <span style="color:var(--clay);">📅</span>
+    </div>
+
+    <div style="display:flex; gap:12px;">
+      <div style="flex:1;">
+        <div class="label">Height</div>
+        <div class="stepper ${state.height==null?'dim':''}">
+          <button class="sbtn" onclick="stepH(-1)">−</button>
+          <span class="sv">${fmtHeight(state.height ?? 66)}</span>
+          <button class="sbtn" onclick="stepH(1)">+</button>
+        </div>
+      </div>
+    </div>
+    <div class="label">Weight</div>
+    <div class="stepper ${state.weight==null?'dim':''}">
+      <button class="sbtn" onclick="stepW(-1)">−</button>
+      <span class="sv">${(state.weight ?? 150)} <small>lb</small></span>
+      <button class="sbtn" onclick="stepW(1)">+</button>
+    </div>
+
+    <div class="label">How active are you?</div>
+    <div class="rows">
+      ${ACTIVITY.map(([k,t,d])=>`
+        <div class="row ${state.activity===k?'on':''}" onclick="state.activity='${k}';render()">
+          <span class="rtext"><span class="rt">${t}</span><span class="rd">${d}</span></span>
+          <span class="mark"></span>
+        </div>`).join("")}
+    </div>`,
+
+  // 4 — SNAPSHOT
+  () => `
+    <div class="eyebrow">Step 04 — Optional snapshot</div>
+    <h1 class="title sm">Where you are,<br>where you're going.</h1>
+    <p class="sub">A front and side photo now, plus one that captures the direction you want. Your Coach uses them to calibrate your plan and track progress.</p>
+    <div class="photo-row">
+      <div class="pslot ${state.pFront?'on':''}" onclick="state.pFront=!state.pFront;render()">
+        <span class="pls">${state.pFront?'✓':'+'}</span><span class="pl">Front</span></div>
+      <div class="pslot ${state.pSide?'on':''}" onclick="state.pSide=!state.pSide;render()">
+        <span class="pls">${state.pSide?'✓':'+'}</span><span class="pl">Side</span></div>
+      <div class="pslot ${state.pGoal?'on':''}" onclick="state.pGoal=!state.pGoal;render()">
+        <span class="pls">${state.pGoal?'✓':'+'}</span><span class="pl">Goal</span></div>
+    </div>
+    <div class="infocard">
+      <div class="ict">How your targets are set</div>
+      <div class="icb">Your daily targets are computed from your stats with a safe minimum floor. Photos sharpen how your Coach reads your starting point and direction — they refine the plan, they don't replace the math.</div>
+    </div>
+    <p class="micro">Have a tape measure? Add waist / neck / hip for a more precise body-comp read — or skip the step.</p>`,
+
+  // 5 — CYCLE
+  () => `
+    <div class="eyebrow">Step 05 — Your cycle</div>
+    <h1 class="title">Built around<br>your phase.</h1>
+    <p class="sub">Your Coach times training intensity and fuel to where you are in your cycle — so the plan works with your body.</p>
+
+    <div class="label" style="margin-bottom:10px;">On hormonal birth control?</div>
+    <div class="switchrow">
+      <span style="font-size:13px; color:var(--cocoaSoft); max-width:74%; line-height:1.45;">${state.onBC?"Your Coach will plan around how you feel day to day instead of a tracked cycle.":"Leave off to track your natural cycle."}</span>
+      <div class="switch ${state.onBC?'on':''}" onclick="state.onBC=!state.onBC;render()"><div class="knob"></div></div>
+    </div>
+
+    ${state.onBC ? "" : `
+      <div class="label">Last period start</div>
+      <div class="vrow" onclick="state.lastPeriod='May 18, 2026';render()">
+        <span class="vv" style="color:${state.lastPeriod?'var(--ink)':'var(--clay)'}">${state.lastPeriod || 'Choose a date'}</span>
+        <span style="color:var(--period);">📅</span>
+      </div>
+      <div class="label">Average cycle length</div>
+      <div class="stepper">
+        <button class="sbtn" onclick="stepC(-1)">−</button>
+        <span class="sv">${state.cycleLen} <small>days</small></span>
+        <button class="sbtn" onclick="stepC(1)">+</button>
+      </div>
+      <p class="micro">A starting estimate. Log periods over time and Wren learns your real average.</p>
+    `}`,
+
+  // 6 — FOOD
+  () => `
+    <div class="eyebrow">Step 06 — How you eat</div>
+    <h1 class="title">What should I<br>plan around?</h1>
+    <p class="sub">Your Coach factors these into every meal it suggests, from day one.</p>
+    <div class="label">Preferences</div>
+    <div class="chips">
+      ${DIET.map(([k,l])=>`<button class="chip ${state.diet.has(k)?'on':''}" onclick="toggleDiet('${k}')">${l}</button>`).join("")}
+    </div>
+    <div class="label">Anything else? <span class="opt">(optional)</span></div>
+    <textarea class="field" id="f_notes" placeholder="No shellfish, lactose intolerant, hate cilantro…" oninput="state.notes=this.value">${esc(state.notes)}</textarea>`,
+
+  // 7 — VIBE
+  () => `
+    <div class="eyebrow">Step 07 — Your Coach's voice</div>
+    <h1 class="title sm">How should it<br>hold you to it?</h1>
+    <p class="sub">Same structure, same accountability — you choose the delivery.</p>
+    <div class="rows" style="margin-top:18px;">
+      ${TONES.map(([k,t,d])=>`
+        <div class="row ${state.tone===k?'on':''}" onclick="state.tone='${k}';render()">
+          <span class="rtext"><span class="rt">${t}</span><span class="rd">${d}</span></span>
+          <span class="mark"></span>
+        </div>`).join("")}
+    </div>`,
+
+  // 8 — MEET COACH
+  () => `
+    <div style="margin-top:24px;">
+      <div class="eyebrow">Your plan is ready${state.name?', '+esc(state.name):''}</div>
+      <h1 class="title" style="margin-top:12px;">Meet<br>your Coach.</h1>
+    </div>
+    <div class="coachhead">
+      <span class="pill">wren</span>
+      <span class="meta">WREN COACH · NOW</span>
+    </div>
+    <div class="bubble">${coachWelcome()}</div>
+    <div class="label">Where do you want to start?</div>
+    <div class="choice ${state.dest==='workout'?'on':''}" onclick="state.dest='workout';render()">
+      <span class="ctext"><span class="ct">Build my plan</span><span class="cd">Your Coach lays out this week's training and daily targets, tuned to your goal and cycle.</span></span>
+      <span class="mark"></span>
+    </div>
+    <div class="choice ${state.dest==='coach'?'on':''}" onclick="state.dest='coach';render()">
+      <span class="ctext"><span class="ct">Set my plan together</span><span class="cd">Talk it through with your Coach first, then lock in the week.</span></span>
+      <span class="mark"></span>
+    </div>`,
+];}
+
+function coachWelcome(){
+  const nm = state.name ? esc(state.name) : "there";
+  const goalLine = {
+    lose_fat:"leaning out at a pace you can hold",
+    tone_up:"recomposition — shape over scale",
+    build_muscle:"building real, measurable strength",
+    feel_better:"steady energy and consistency",
+    maintain:"holding your shape with structure",
+  }[state.goal];
+  return `Hi ${nm} — I'm Wren, your coach. Here's how we work: I'll set your food and training plan around ${goalLine}, check in daily, and adjust it to your cycle as we go. I'll keep you accountable — calm, never harsh. Let's get your first week mapped.`;
+}
+
+function pickGoal(k){ state.goal=k; render(); }
+function toggleDiet(k){ state.diet.has(k)?state.diet.delete(k):state.diet.add(k); render(); }
+function bumpAge(){ state.age = state.age ? null : 29; render(); }
+function stepH(d){ state.height = clamp((state.height ?? 66)+d,54,84); render(); }
+function stepW(d){ state.weight = clamp((state.weight ?? 150)+d,80,350); render(); }
+function stepC(d){ state.cycleLen = String(clamp(parseInt(state.cycleLen)+d,21,40)); render(); }
+function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
+function esc(s){ return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+function go(d){ step = clamp(step+d,0,TOTAL-1); document.getElementById('screenBody').scrollTop=0; render(); }
+
+const STEP_NAMES = ["Welcome","Name","Goal","Body basics","Snapshot (optional)","Cycle","Food preferences","Coach voice","Meet your Coach"];
+const LABELS = ["","THE BASICS","YOUR GOAL","ABOUT YOU","SNAPSHOT","YOUR CYCLE","HOW YOU EAT","COACH VOICE","YOUR COACH"];
+
+function render(){
+  // index progress
+  const pct = (step/(TOTAL-1))*100;
+  const idx = document.getElementById('index');
+  if(step===0){ idx.style.visibility='hidden'; }
+  else{
+    idx.style.visibility='visible';
+    idx.innerHTML = `<span class="num">0${step} <b>/ 07</b></span><span class="rule"><i style="width:${(step/7)*100}%"></i></span><span class="num" style="color:var(--clay)">${LABELS[step]}</span>`;
+  }
+  // body with entrance animation
+  const b = document.getElementById('screenBody');
+  b.className = 'body';
+  b.innerHTML = `<div class="enter">${screens()[step]()}</div>`;
+
+  // footer
+  const f = document.getElementById('footer');
+  const optional = [3,4,5,6];
+  if(step===0){
+    f.innerHTML = `<button class="next" onclick="go(1)">Begin ${ARROW}</button>`;
+  } else if(step===TOTAL-1){
+    f.innerHTML = `<button class="back" onclick="go(-1)">Back</button>
+      <button class="next" onclick="finish()">${state.dest==='workout'?'Build my plan':'Start together'} ${ARROW}</button>`;
+  } else {
+    const skip = optional.includes(step) ? `<button class="skip" onclick="go(1)">Skip</button>` : "";
+    f.innerHTML = `<button class="back" onclick="go(-1)">Back</button>${skip}<button class="next" onclick="go(1)">Continue ${ARROW}</button>`;
+  }
+  document.getElementById('stepName').textContent = `Screen ${step+1} / ${TOTAL} — ${STEP_NAMES[step]}`;
+}
+
+function finish(){
+  document.getElementById('index').style.visibility='hidden';
+  document.getElementById('screenBody').innerHTML = `
+    <div class="enter" style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
+      <div class="wordmark" style="font-size:52px;">wren</div>
+      <div class="tagline">A softer science</div>
+      <p class="hero-sub" style="max-width:230px; text-align:center;">${state.dest==='workout'?'Mapping your first week of training and targets…':'Opening your Coach to plan together…'}</p>
+    </div>`;
+  document.getElementById('footer').innerHTML = `<button class="next ghost" onclick="step=0;render()">Restart prototype</button>`;
+}
+
+render();
+</script>
+</body>
+</html>

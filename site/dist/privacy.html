@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>wren — privacy policy</title>
+<style>
+  :root {
+    --cream: #FBF7F0; --vapor: #E3E8E9; --cocoa: #3B2F22;
+    --clay: #8A7B68; --paper: #FFFFFF;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--cream); color: var(--cocoa);
+    font-family: "Manrope", -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+    line-height: 1.65; -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 640px; margin: 0 auto; padding: 56px 24px 80px; }
+  .wordmark { font-size: 44px; font-weight: 800; letter-spacing: -1.5px; }
+  .eyebrow {
+    font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--clay); margin-top: 6px;
+  }
+  h2 {
+    font-size: 15px; letter-spacing: 1.5px; text-transform: uppercase;
+    margin: 40px 0 10px; padding-top: 24px; border-top: 1px solid var(--vapor);
+  }
+  p, li { font-size: 15.5px; color: var(--cocoa); margin-bottom: 10px; }
+  ul { padding-left: 20px; margin-bottom: 10px; }
+  .muted { color: var(--clay); font-size: 13.5px; }
+  a { color: var(--cocoa); }
+  .card {
+    background: var(--paper); border-radius: 14px; padding: 18px 20px;
+    margin: 18px 0; box-shadow: 0 3px 8px rgba(59,47,34,0.08);
+  }
+  .updated { margin-top: 48px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="wordmark">wren</div>
+  <div class="eyebrow">Privacy Policy</div>
+
+  <div class="card">
+    <p><strong>The short version:</strong> your data lives on your phone. Wren has no accounts, no server of its own, no analytics, no ads, and no data sales. The only things that ever leave your device are the messages and photos you send to the AI coach, and anonymous food-lookup queries.</p>
+  </div>
+
+  <h2>What Wren stores, and where</h2>
+  <p>Everything you log in Wren — food entries, workouts, cycle data, measurements, goals, coach conversations, and settings — is stored locally on your device. Wren does not operate its own servers and cannot see your data. Deleting the app deletes this data.</p>
+
+  <h2>What leaves your device</h2>
+  <ul>
+    <li><strong>AI coach conversations.</strong> When you chat with the coach, your messages — along with relevant context from your logs (such as recent food, workouts, and, if enabled, cycle phase) — are sent to Anthropic's Claude API to generate the coach's replies. If you photograph a meal or nutrition label, that photo is sent for the same purpose. Anthropic processes this data under its <a href="https://www.anthropic.com/legal/commercial-terms">commercial terms</a>; API inputs and outputs are not used to train Anthropic's models.</li>
+    <li><strong>Food lookups.</strong> When you search for a food or scan a barcode, the search text or barcode number is sent to Open Food Facts, a public, non-profit food database. No personal information accompanies these lookups.</li>
+  </ul>
+  <p>That's the complete list. Wren sends nothing else anywhere.</p>
+
+  <h2>What Wren doesn't do</h2>
+  <ul>
+    <li>No user accounts and no sign-in — there is nothing to breach on our side.</li>
+    <li>No analytics, tracking, or advertising SDKs.</li>
+    <li>No selling, sharing, or monetizing of your data, ever.</li>
+  </ul>
+
+  <h2>Your choices</h2>
+  <ul>
+    <li>Cycle tracking is optional and can be turned off in Settings; when off, cycle data is not collected, shown, or shared with the coach.</li>
+    <li>The coach's long-term memory about you is viewable and deletable in Settings.</li>
+    <li>Deleting the app removes all locally stored data.</li>
+  </ul>
+
+  <h2>A note on health</h2>
+  <p>Wren is a wellness companion, not a medical device, and the coach does not give medical advice. For anything medical — including questions about your cycle, nutrition needs, or eating patterns — please talk to your doctor or care provider. If you are struggling with food or body image, support is available: in the US, contact the National Eating Disorders Association at nationaleatingdisorders.org, or call or text 988.</p>
+
+  <h2>Beta testing</h2>
+  <p>During TestFlight beta testing, Apple collects crash logs and any feedback you choose to send through TestFlight, governed by Apple's terms. This feedback comes to the developer to improve the app.</p>
+
+  <h2>Contact</h2>
+  <p>Questions or requests: <a href="mailto:tinggeidel@gmail.com">tinggeidel@gmail.com</a></p>
+
+  <p class="muted updated">Last updated July 5, 2026 · Wren is developed by Ting Geidel.</p>
+</div>
+</body>
+</html>

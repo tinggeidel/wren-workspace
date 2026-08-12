@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img">
+  <title>Wren app icon</title>
+  <desc>App icon: lowercase bold sans-serif wordmark "wren" rendered in espresso, centered on a vapor-colored rounded square. Production face: PP Neue Montreal Bold or Manrope 700.</desc>
+  <rect x="0" y="0" width="512" height="512" rx="112" fill="#E3E8E9"/>
+  <text x="256" y="320"
+        text-anchor="middle"
+        font-family="'PP Neue Montreal', 'Manrope', 'Helvetica Neue', Arial, sans-serif"
+        font-weight="700"
+        font-size="200"
+        letter-spacing="-8"
+        fill="#3B2F22">wren</text>
+</svg>

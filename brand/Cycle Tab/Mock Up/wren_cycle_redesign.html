@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wren — Cycle Tab Redesign</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/manrope@5.2.5/400.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/manrope@5.2.5/500.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/manrope@5.2.5/600.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/manrope@5.2.5/700.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/manrope@5.2.5/800.css">
+<style>
+  :root{
+    /* standardized with Progress/Food — warm bg, cream cards, no pure white */
+    --backdrop:#EFE7DA; --bg:#F3ECDF; --glaze:#FBF7F0; --cream:#F5EFE6; --card:#FCFAF6; --paper:#FCFAF6; --vapor:#E3E8E9;
+    --ink:#3B2F22; --ink2:#5A4B3A; --cocoa:#6B5641; --cocoaSoft:#6B5641; --clay:#8A7B68; --taupe:#8A7B68; --latte:#C8A989;
+    --line:rgba(59,47,34,0.09); --lineSoft:rgba(59,47,34,0.05); --slate:#7E9AA0;
+    --mens:#BE6A5E; --foll:#A9B196; --ovul:#E0C49C; --lut:#C99B93;
+    --shadow:0 1px 2px rgba(59,47,34,.04), 0 14px 30px -24px rgba(59,47,34,.20);
+    --soft:0 1px 2px rgba(59,47,34,.04), 0 14px 30px -24px rgba(59,47,34,.20);
+    --ease:cubic-bezier(.22,1,.36,1);
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--backdrop); font-family:'Manrope',system-ui,sans-serif; color:var(--ink);}
+  .stage{min-height:100vh; display:flex; flex-direction:column; align-items:center; gap:14px; padding:28px 0 48px;}
+  .cap{font-size:11px; letter-spacing:2.5px; color:var(--clay); font-weight:600; text-transform:uppercase;}
+
+  .phone{width:362px; background:#16110C; border-radius:48px; padding:11px; box-shadow:0 40px 90px -26px rgba(40,28,16,.5);}
+  .screen{background:var(--bg); border-radius:38px; overflow:hidden; height:786px; position:relative; display:flex; flex-direction:column;}
+
+  .statusbar{display:flex; justify-content:space-between; align-items:center; padding:16px 26px 4px; font-size:13px; color:var(--ink); font-weight:600; flex-shrink:0;}
+  .statusbar .d{display:flex; gap:5px; align-items:center; font-size:11px;}
+
+  .head{padding:12px 26px 4px; display:flex; justify-content:space-between; align-items:flex-end; flex-shrink:0;}
+  .head .eyebrow{font-size:9px; letter-spacing:3px; color:var(--taupe); font-weight:600; text-transform:uppercase;}
+  .head h1{font-weight:700; font-size:36px; color:var(--ink); line-height:1; letter-spacing:-1.6px; margin:8px 0 0;}
+  .avatar{width:40px; height:40px; border-radius:50%; background:var(--ink); display:flex; align-items:center; justify-content:center; color:var(--glaze); font-weight:700; font-size:12.5px; flex-shrink:0; cursor:pointer;}
+
+  .body{flex:1; overflow-y:auto; padding:6px 26px 16px;}
+  .body::-webkit-scrollbar{width:0;}
+  .enter > *{opacity:0; transform:translateY(9px); animation:rise .55s cubic-bezier(.2,.8,.2,1) forwards;}
+  .enter > *:nth-child(1){animation-delay:.02s}.enter > *:nth-child(2){animation-delay:.08s}
+  .enter > *:nth-child(3){animation-delay:.14s}.enter > *:nth-child(4){animation-delay:.20s}
+  .enter > *:nth-child(5){animation-delay:.26s}.enter > *:nth-child(6){animation-delay:.32s}
+  @keyframes rise{to{opacity:1;transform:none;}}
+
+  /* ===== matte gradient ring ===== */
+  .ring-wrap{position:relative; width:212px; height:212px; margin:18px auto 8px;}
+  .ring{position:absolute; inset:0; border-radius:50%;
+    background:conic-gradient(from 0deg,
+      #BE6A5E 0deg, #B4886E 84deg, #A9B196 132deg, #C7C09E 175deg,
+      #E0C49C 200deg, #D6AE98 245deg, #C99B93 300deg, #BE6A5E 360deg);
+    -webkit-mask:radial-gradient(farthest-side, transparent calc(100% - 9px), #000 calc(100% - 9px));
+            mask:radial-gradient(farthest-side, transparent calc(100% - 9px), #000 calc(100% - 9px));}
+  .ring-marker{position:absolute; top:50%; left:50%; width:11px; height:11px; margin:-5.5px; border-radius:50%;
+    background:var(--ink); border:2px solid var(--bg); transform:rotate(334.3deg) translateY(-95px);}
+  .ring-center{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;}
+  .ring-center .rcd{font-size:9px; letter-spacing:3.5px; color:var(--clay); font-weight:700; text-transform:uppercase;}
+  .ring-center .rnum{font-size:60px; font-weight:800; letter-spacing:-3px; color:var(--ink); line-height:.92; margin-top:8px;}
+  .ring-center .rof{font-size:11.5px; color:var(--clay); margin-top:4px; letter-spacing:.3px;}
+  .ring-center .rph{font-size:15px; font-weight:700; color:var(--ink); margin-top:14px; letter-spacing:-0.2px;}
+  .ring-center .rsub{font-size:11px; color:var(--cocoaSoft); margin-top:4px; letter-spacing:.2px;}
+
+  .legend{display:flex; justify-content:center; gap:18px; margin:18px 0 2px;}
+  .lg{display:flex; align-items:center; gap:7px; font-size:9px; letter-spacing:1.4px; color:var(--clay); font-weight:600; text-transform:uppercase;}
+  .lg .sw{width:8px; height:8px; border-radius:50%;}
+  .lg.cur{color:var(--ink); font-weight:700;}
+
+  /* insight — quiet card */
+  .insight{background:var(--card); border-radius:18px; padding:18px 20px; margin-top:22px; box-shadow:var(--soft);}
+  .insight .it{font-size:9px; letter-spacing:2.5px; color:var(--taupe); font-weight:600; text-transform:uppercase;}
+  .insight .ib{font-size:14px; color:var(--cocoaSoft); line-height:1.6; margin-top:10px;}
+
+  .secLabel{display:flex; justify-content:space-between; align-items:center; margin:26px 4px 13px;}
+  .secLabel .ld{width:6px; height:6px; border-radius:50%; display:inline-block; margin-right:8px;}
+  .secLabel .l{font-size:9px; letter-spacing:2.5px; color:var(--taupe); font-weight:600; text-transform:uppercase;}
+  .secLabel .lwrap{display:flex; align-items:center;}
+  .secLabel .r{font-size:10px; letter-spacing:.6px; color:var(--taupe); font-weight:500;}
+
+  .next7{display:flex; gap:7px;}
+  .n7{flex:1; text-align:center; padding:11px 0 10px; border-radius:15px;}
+  .n7 .w{font-size:8.5px; letter-spacing:.6px; color:var(--clay); font-weight:700; text-transform:uppercase;}
+  .n7 .n{font-size:15px; font-weight:700; color:var(--ink2); margin-top:5px; letter-spacing:-0.4px;}
+  .n7 .pdot{width:5px; height:5px; border-radius:50%; margin:7px auto 0;}
+  .n7.today{background:var(--ink);}
+  .n7.today .w{color:rgba(251,247,240,.7);} .n7.today .n{color:var(--glaze);}
+
+  /* calendar — tonal wash */
+  .calhead{display:flex; align-items:center; justify-content:space-between; margin:6px 2px 14px;}
+  .calhead .m{font-size:15px; font-weight:700; letter-spacing:-0.3px; color:var(--ink);}
+  .calhead .nav{width:30px; height:30px; border-radius:50%; border:1px solid var(--line); background:var(--paper); color:var(--ink2); cursor:pointer; font-size:13px; display:flex;align-items:center;justify-content:center;}
+  .dow{display:grid; grid-template-columns:repeat(7,1fr); margin-bottom:10px;}
+  .dow span{text-align:center; font-size:9px; letter-spacing:1px; color:var(--clay); font-weight:700;}
+  .grid{display:grid; grid-template-columns:repeat(7,1fr); gap:6px;}
+  .cday{aspect-ratio:1; border-radius:13px; display:flex; align-items:center; justify-content:center; position:relative; font-size:13px; font-weight:600; color:var(--ink2);}
+  .cday.empty{background:transparent;}
+  .cday.prev{color:#C3B8A6;}
+  .cday.mens{background:rgba(190,106,94,.16);}
+  .cday.mens.bleedday{background:rgba(190,106,94,.30); color:var(--ink);}
+  .cday.foll{background:rgba(169,177,150,.22);}
+  .cday.ovul{background:rgba(224,196,156,.30);}
+  .cday.lut{background:rgba(201,155,147,.20);}
+  .cday.today{box-shadow:inset 0 0 0 1.5px var(--ink); color:var(--ink); font-weight:800;}
+  .cday .bleed{position:absolute; bottom:5px; left:50%; transform:translateX(-50%); width:4px; height:4px; border-radius:50%; background:var(--mens);}
+  .calnote{font-size:11.5px; color:var(--clay); text-align:center; margin-top:16px;}
+
+  /* meta — single quiet card, divided */
+  .meta{display:flex; background:var(--card); border-radius:18px; margin-top:20px; box-shadow:var(--soft);}
+  .meta > div{flex:1; padding:16px 18px;}
+  .meta > div + div{border-left:1px solid var(--lineSoft);}
+  .meta .mt{font-size:9px; letter-spacing:2px; color:var(--taupe); font-weight:600; text-transform:uppercase;}
+  .meta .mv{font-size:18px; font-weight:700; color:var(--ink); letter-spacing:-0.4px; margin-top:7px;}
+  .meta .md{font-size:11px; color:var(--taupe); margin-top:4px;}
+
+  .disclaimer{font-size:11px; color:var(--clay); text-align:center; line-height:1.55; margin-top:24px; padding:0 14px;}
+
+  .tabnav{background:var(--glaze); padding:11px 12px 22px; border-top:0.5px solid var(--line); display:flex; justify-content:space-around; align-items:flex-start; flex-shrink:0;}
+  .tab{text-align:center; flex:1; display:flex; flex-direction:column; align-items:center;}
+  .tab .dot{width:6px; height:6px; border-radius:50%; border:1.5px solid var(--latte); margin-bottom:6px;}
+  .tab.on .dot{background:var(--ink); border-color:var(--ink);}
+  .tab .tl{font-size:8px; letter-spacing:1px; font-weight:600; color:var(--taupe); text-transform:uppercase;}
+  .tab.on .tl{color:var(--ink);}
+
+  .fab{position:absolute; right:22px; bottom:94px; width:52px; height:52px; border-radius:50%; background:var(--ink); border:none; color:var(--glaze); font-size:26px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 14px 28px -10px rgba(59,47,34,.5); z-index:10; transition:transform .15s;}
+  .fab:active{transform:scale(.94);}
+
+  /* ===== Today sheet ===== */
+  .scrim{position:absolute; inset:0; background:rgba(26,16,10,.42); opacity:0; pointer-events:none; transition:opacity .3s; z-index:20; border-radius:38px;}
+  .scrim.on{opacity:1; pointer-events:auto;}
+  .sheet{position:absolute; left:0; right:0; bottom:0; background:var(--glaze); border-radius:28px 28px 38px 38px; transform:translateY(102%); transition:transform .36s var(--ease); z-index:21; max-height:93%; display:flex; flex-direction:column;}
+  .sheet.on{transform:translateY(0);}
+  .handle{display:flex; justify-content:center; padding:11px 0 0; flex-shrink:0;}
+  .handle i{width:36px; height:4px; background:var(--latte); border-radius:100px;}
+  .shead{padding:14px 24px 0; display:flex; justify-content:space-between; align-items:flex-end; flex-shrink:0;}
+  .shead .ss{font-size:9px; letter-spacing:3px; color:var(--clay); font-weight:700; text-transform:uppercase;}
+  .shead .st{font-weight:800; font-size:30px; color:var(--ink); letter-spacing:-1.4px; margin-top:7px;}
+  .shead .x{background:transparent; border:none; color:var(--clay); font-size:23px; cursor:pointer; line-height:1; padding:4px;}
+  .scon{overflow-y:auto; padding:6px 24px 20px;}
+  .scon::-webkit-scrollbar{width:0;}
+  .sgroup{font-size:9px; letter-spacing:2.5px; color:var(--clay); font-weight:700; text-transform:uppercase; margin:22px 0 12px;}
+  .schips{display:flex; flex-wrap:wrap; gap:8px;}
+  .schip{border:1px solid var(--line); background:var(--paper); border-radius:100px; padding:10px 16px; font-family:inherit; font-size:13px; font-weight:500; color:var(--ink); cursor:pointer; transition:all .15s;}
+  .schip:hover{border-color:var(--clay);}
+  .schip.on{background:var(--ink); border-color:var(--ink); color:var(--glaze);}
+  .schip.flow.on{background:var(--mens); border-color:var(--mens); color:#fff;}
+  .snote{width:100%; background:var(--paper); border:1px solid var(--line); border-radius:14px; padding:14px; font-family:inherit; font-size:14px; color:var(--ink); outline:none; resize:none; min-height:62px;}
+  .snote::placeholder{color:var(--clay);}
+  .scta{margin-top:24px;}
+  .scta button{width:100%; background:var(--ink); color:var(--glaze); border:none; padding:16px; border-radius:100px; font-family:inherit; font-size:12px; font-weight:700; letter-spacing:2.5px; text-transform:uppercase; cursor:pointer;}
+  .sfoot{font-size:11px; color:var(--clay); text-align:center; line-height:1.5; margin-top:14px;}
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="cap" style="opacity:.6;">Wren — Cycle Tab Redesign · v1.2 · matte · tap + for today's check-in</div>
+  <div class="phone">
+    <div class="screen">
+      <div class="statusbar"><span>9:41</span><span class="d"><span>●●●</span><span>◗</span></span></div>
+      <div class="head">
+        <div><div class="eyebrow">Cycle · May 2026</div><h1>cycle</h1></div>
+        <div class="avatar">TG</div>
+      </div>
+      <div class="body"><div class="enter" id="bodyInner"></div></div>
+      <button class="fab" onclick="openSheet()">+</button>
+      <div class="tabnav">
+        <div class="tab"><div class="dot"></div><div class="tl">Coach</div></div>
+        <div class="tab"><div class="dot"></div><div class="tl">Food</div></div>
+        <div class="tab on"><div class="dot"></div><div class="tl">Cycle</div></div>
+        <div class="tab"><div class="dot"></div><div class="tl">Workout</div></div>
+        <div class="tab"><div class="dot"></div><div class="tl">Progress</div></div>
+      </div>
+      <div class="scrim" id="scrim" onclick="closeSheet()"></div>
+      <div class="sheet" id="sheet"></div>
+    </div>
+  </div>
+  <div class="cap" style="opacity:.55;">Cycle · main view</div>
+</div>
+
+<script>
+function phaseOf(dom){
+  if(dom<=5) return 'lut-prev';
+  if(dom<=10) return 'mens';
+  if(dom<=18) return 'foll';
+  if(dom<=21) return 'ovul';
+  return 'lut';
+}
+const TODAY=31;
+const PH_COLOR={mens:'var(--mens)',foll:'var(--foll)',ovul:'var(--ovul)',lut:'var(--lut)'};
+
+const next7=[
+  {w:'Sun',n:31,ph:'lut',today:true},
+  {w:'Mon',n:1,ph:'lut'},
+  {w:'Tue',n:2,ph:'mens'},
+  {w:'Wed',n:3,ph:'mens'},
+  {w:'Thu',n:4,ph:'mens'},
+  {w:'Fri',n:5,ph:'mens'},
+  {w:'Sat',n:6,ph:'foll'},
+];
+
+function mainView(){
+  const firstCol=5, days=31;
+  let cells='';
+  for(let i=0;i<firstCol;i++) cells+=`<div class="cday empty"></div>`;
+  for(let d=1; d<=days; d++){
+    const p=phaseOf(d);
+    const cls = p==='lut-prev' ? 'lut prev' : p;
+    const bleed = (p==='mens');
+    cells+=`<div class="cday ${cls} ${bleed?'bleedday':''} ${d===TODAY?'today':''}">${d}${bleed?'<span class="bleed"></span>':''}</div>`;
+  }
+  const n7 = next7.map(d=>`
+    <div class="n7 ${d.today?'today':''}">
+      <div class="w">${d.w}</div><div class="n">${d.n}</div>
+      ${d.today?'':`<div class="pdot" style="background:${PH_COLOR[d.ph]}"></div>`}
+    </div>`).join("");
+
+  return `
+    <div class="ring-wrap">
+      <div class="ring"></div>
+      <div class="ring-marker"></div>
+      <div class="ring-center">
+        <div class="rcd">Cycle day</div>
+        <div class="rnum">26</div>
+        <div class="rof">of 28</div>
+        <div class="rph">Luteal phase</div>
+        <div class="rsub">Period in ~2 days</div>
+      </div>
+    </div>
+
+    <div class="legend">
+      <span class="lg"><span class="sw" style="background:var(--mens)"></span>Menstrual</span>
+      <span class="lg"><span class="sw" style="background:var(--foll)"></span>Follicular</span>
+      <span class="lg"><span class="sw" style="background:var(--ovul)"></span>Ovulation</span>
+      <span class="lg cur"><span class="sw" style="background:var(--lut)"></span>Luteal</span>
+    </div>
+
+    <div class="insight">
+      <div class="it">Luteal · what to expect</div>
+      <div class="ib">Endurance holds steadier than peak intensity right now, so your plan eases volume toward your period. Energy running a little lower is expected — not a setback. Protein and magnesium-rich foods help with the dip.</div>
+    </div>
+
+    <div class="secLabel"><span class="lwrap"><span class="ld" style="background:var(--lut)"></span><span class="l">Next 7 days</span></span><span class="r">May 31 — Jun 6</span></div>
+    <div class="next7">${n7}</div>
+
+    <div style="margin-top:26px;">
+      <div class="calhead"><button class="nav">‹</button><div class="m">May 2026</div><button class="nav">›</button></div>
+      <div class="dow"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>
+      <div class="grid">${cells}</div>
+      <div class="calnote">Tap any day to remember how it felt.</div>
+    </div>
+
+    <div class="meta">
+      <div><div class="mt">Last period</div><div class="mv">May 6 – 10</div><div class="md">5 days · typical</div></div>
+      <div><div class="mt">Your average</div><div class="mv">~28 days</div><div class="md">Sharpens as you log</div></div>
+    </div>
+
+    <div class="disclaimer">Phases are a starting estimate — go by how you actually feel. Wren isn't medical advice.</div>`;
+}
+
+function render(){ document.getElementById('bodyInner').innerHTML = mainView(); }
+
+const FLOW=["Spotting","Light","Medium","Heavy"];
+const ENERGY=["Low","Medium","High"];
+const MOOD=["Happy","Calm","Motivated","Irritable","Anxious","Sad","Sensitive","Stressed","Foggy"];
+const SYMPTOMS=["Cramps","Bloating","Headache","Breast tenderness","Backache","Acne","Fatigue","Cravings","Insomnia","Nausea"];
+const DIGEST=["Normal","Bloated","Gassy","Constipated","Loose","Nauseous","Reflux"];
+
+function sheetHTML(){
+  const chips=(arr,flow)=>arr.map(x=>`<button class="schip ${flow?'flow':''}" onclick="this.classList.toggle('on')">${x}</button>`).join("");
+  return `
+    <div class="handle"><i></i></div>
+    <div class="shead">
+      <div><div class="ss">Sun · May 31 · Cycle day 26</div><div class="st">today</div></div>
+      <button class="x" onclick="closeSheet()">×</button>
+    </div>
+    <div class="scon">
+      <div class="sgroup">Period &amp; flow</div><div class="schips">${chips(FLOW,true)}</div>
+      <div class="sgroup">Energy</div><div class="schips">${chips(ENERGY)}</div>
+      <div class="sgroup">Mood · pick any that fit</div><div class="schips">${chips(MOOD)}</div>
+      <div class="sgroup">Symptoms · pick any that fit</div><div class="schips">${chips(SYMPTOMS)}</div>
+      <div class="sgroup">Digestion</div><div class="schips">${chips(DIGEST)}</div>
+      <div class="sgroup">A note for your Coach</div>
+      <textarea class="snote" placeholder="Anything else you want your Coach to know about today…"></textarea>
+      <div class="scta"><button onclick="closeSheet()">Save today</button></div>
+      <div class="sfoot">Or close without saving — nothing here is required.</div>
+    </div>`;
+}
+function openSheet(){ document.getElementById('sheet').innerHTML=sheetHTML(); document.getElementById('sheet').classList.add('on'); document.getElementById('scrim').classList.add('on'); }
+function closeSheet(){ document.getElementById('sheet').classList.remove('on'); document.getElementById('scrim').classList.remove('on'); }
+
+render();
+</script>
+</body>
+</html>

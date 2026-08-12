@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wren — Progress Tab Redesign</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/manrope@5.2.5/400.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/manrope@5.2.5/500.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/manrope@5.2.5/600.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/manrope@5.2.5/700.css">
+<style>
+  :root{
+    --bg:#F3ECDF; --glaze:#FBF7F0; --card:#FCFAF6; --cream:#F5EFE6; --butter:#F1E3C9; --vapor:#E3E8E9;
+    --espresso:#3B2F22; --cocoa:#6B5641; --taupe:#8A7B68; --latte:#C8A989;
+    --sage:#A8B89B; --rose:#D4A89E; --clay:#B8765E; --honey:#E8B86A;
+    --slate:#7E9AA0; --slateFill:#DDE6E4; --lut:#C99B93;
+    --line:rgba(59,47,34,0.09); --lineSoft:rgba(59,47,34,0.05);
+    --soft:0 1px 2px rgba(59,47,34,.04), 0 14px 30px -24px rgba(59,47,34,.20);
+    --ease:cubic-bezier(.22,1,.36,1);
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--bg); font-family:'Manrope',system-ui,sans-serif; color:var(--espresso);}
+  .stage{min-height:100vh; display:flex; flex-direction:column; align-items:center; gap:14px; padding:28px 0 48px;}
+  .cap{font-size:11px; letter-spacing:2.5px; color:var(--taupe); font-weight:600; text-transform:uppercase;}
+
+  .phone{width:362px; background:#16110C; border-radius:48px; padding:11px; box-shadow:0 40px 90px -26px rgba(40,28,16,.5);}
+  .screen{background:var(--bg); border-radius:38px; overflow:hidden; height:786px; position:relative; display:flex; flex-direction:column;}
+
+  .statusbar{display:flex; justify-content:space-between; align-items:center; padding:16px 26px 4px; font-size:13px; color:var(--espresso); font-weight:600; flex-shrink:0;}
+  .statusbar .d{display:flex; gap:5px; align-items:center; font-size:11px;}
+
+  .head{padding:10px 24px 2px; display:flex; justify-content:space-between; align-items:flex-end; flex-shrink:0;}
+  .head .eyebrow{font-size:9px; letter-spacing:3px; color:var(--taupe); font-weight:600; text-transform:uppercase;}
+  .head h1{font-weight:700; font-size:36px; color:var(--espresso); line-height:1; letter-spacing:-1.6px; margin:8px 0 0;}
+  .avatar{width:40px; height:40px; border-radius:50%; background:var(--espresso); display:flex; align-items:center; justify-content:center; color:var(--glaze); font-weight:700; font-size:12.5px; margin-bottom:4px; flex-shrink:0; cursor:pointer;}
+
+  .range{margin:16px 24px 0; background:var(--cream); border-radius:100px; padding:4px; display:flex; gap:2px; flex-shrink:0;}
+  .range button{flex:1; border:none; background:transparent; padding:10px 0; border-radius:100px; font-family:inherit; font-size:12.5px; font-weight:600; color:var(--taupe); cursor:pointer; transition:all .32s var(--ease);}
+  .range button.on{background:var(--glaze); color:var(--espresso); box-shadow:0 1px 4px rgba(59,47,34,.1);}
+
+  .datenav{display:flex; align-items:center; justify-content:space-between; padding:16px 26px 2px; flex-shrink:0;}
+  .datenav .lbl{font-size:13.5px; font-weight:700; color:var(--espresso); letter-spacing:-0.2px;}
+  .datenav button{width:30px; height:30px; border-radius:50%; border:1px solid var(--line); background:var(--card); color:var(--cocoa); cursor:pointer; font-size:13px; display:flex; align-items:center; justify-content:center; transition:all .2s var(--ease);}
+  .datenav button:disabled{opacity:.3; cursor:default;}
+
+  .body{flex:1; overflow-y:auto; padding:8px 24px 16px;}
+  .body::-webkit-scrollbar{width:0;}
+  .enter > *{opacity:0; transform:translateY(9px); animation:rise .5s var(--ease) forwards;}
+  .enter > *:nth-child(1){animation-delay:.02s}.enter > *:nth-child(2){animation-delay:.08s}
+  .enter > *:nth-child(3){animation-delay:.14s}.enter > *:nth-child(4){animation-delay:.20s}
+  .enter > *:nth-child(5){animation-delay:.26s}.enter > *:nth-child(6){animation-delay:.32s}
+  .enter > *:nth-child(7){animation-delay:.38s}
+  @keyframes rise{to{opacity:1;transform:none;}}
+
+  /* eyebrow */
+  .secLabel{display:flex; align-items:center; margin:24px 4px 11px;}
+  .secLabel:first-child{margin-top:6px;}
+  .secLabel .ld{width:6px; height:6px; border-radius:50%; display:inline-block; margin-right:8px;}
+  .secLabel .l{font-size:9px; letter-spacing:2.5px; color:var(--taupe); font-weight:600; text-transform:uppercase;}
+
+  /* insight card */
+  .card{background:var(--card); border-radius:18px; padding:20px; box-shadow:var(--soft);}
+  .ihead{display:flex; justify-content:space-between; align-items:flex-start;}
+  .ihl{font-size:25px; font-weight:700; letter-spacing:-1.1px; color:var(--espresso); line-height:1.05;}
+  .isub{font-size:13px; color:var(--taupe); margin-top:6px; font-weight:500;}
+  .chev{color:var(--taupe); font-size:18px; line-height:1; margin-top:2px;}
+  .ibody{margin-top:20px;}
+  .idiv{margin-top:18px; padding-top:15px; border-top:0.5px solid var(--lineSoft);}
+  .icap{font-size:14px; color:var(--cocoa); line-height:1.6;}
+  .icap b{color:var(--espresso); font-weight:700;}
+
+  /* progress + day dots */
+  .prbar{height:6px; background:var(--slateFill); border-radius:100px; overflow:hidden;}
+  .prbar i{display:block; height:100%; background:var(--slate); border-radius:100px;}
+  .weekdots{display:flex; justify-content:space-between; margin-top:16px;}
+  .wd{text-align:center; flex:1;}
+  .wd .wl{font-size:8.5px; letter-spacing:.5px; color:var(--taupe); font-weight:600;}
+  .wd .wc{width:20px; height:20px; border-radius:50%; margin:7px auto 0; border:1.5px solid var(--line); position:relative;}
+  .wd .wc.on{background:var(--sage); border-color:var(--sage);}
+  .wd .wc.on:after{content:""; position:absolute; top:5px; left:4.5px; width:8px; height:4.5px; border-left:1.8px solid #fff; border-bottom:1.8px solid #fff; transform:rotate(-45deg);}
+
+  /* bars */
+  .bars{display:flex; align-items:flex-end; gap:8px; height:96px;}
+  .bar{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%;}
+  .bar .track{width:100%; max-width:20px; height:100%; display:flex; align-items:flex-end; background:var(--lineSoft); border-radius:100px;}
+  .bar .col{width:100%; border-radius:100px; background:var(--slate); transition:height .4s var(--ease);}
+  .bar.cur .col{background:var(--espresso);}
+  .bar .bl{font-size:8.5px; color:var(--taupe); font-weight:500; margin-top:9px;}
+
+  /* mood dot timeline */
+  .mlegend{display:flex; gap:15px; justify-content:center; margin-top:12px;}
+  .mlg{display:flex; align-items:center; gap:6px; font-size:9px; letter-spacing:1.2px; font-weight:600; color:var(--taupe); text-transform:uppercase;}
+  .mlg i{width:8px; height:8px; border-radius:50%;}
+  .wmk{display:flex; justify-content:space-between; margin-top:6px; padding:0 4px;}
+  .wmk span{font-size:8.5px; letter-spacing:1px; color:var(--taupe); font-weight:600; text-transform:uppercase;}
+
+  /* mini cycle rings */
+  .ringrow{display:flex; justify-content:space-around; gap:10px;}
+  .mr{text-align:center;}
+  .mring{position:relative; width:58px; height:58px; margin:0 auto;}
+  .mring .halo{position:absolute; inset:-7px; border-radius:50%; background:radial-gradient(closest-side,#F1E7D6, rgba(241,231,214,0) 78%); z-index:0;}
+  .mring .bg{position:absolute; inset:0; border-radius:50%; z-index:1;
+    background:conic-gradient(from 0deg,#BE6A5E 0deg,#A9B196 122deg,#E0C49C 193deg,#C99B93 289deg,#BE6A5E 360deg);
+    -webkit-mask:radial-gradient(farthest-side, transparent calc(100% - 5px), #000 calc(100% - 5px));
+            mask:radial-gradient(farthest-side, transparent calc(100% - 5px), #000 calc(100% - 5px));}
+  .mring .mc{position:absolute; inset:0; z-index:2; display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:700; color:var(--espresso); letter-spacing:-0.5px;}
+  .mrl{font-size:9px; letter-spacing:1px; color:var(--taupe); font-weight:600; text-transform:uppercase; margin-top:10px;}
+  .mr.cur .mrl{color:var(--espresso);}
+
+  /* stat row + link + pill */
+  .statrow{display:flex; justify-content:space-between; align-items:center;}
+  .statrow .sk{font-size:13.5px; color:var(--espresso); font-weight:500;}
+  .statrow .skd{font-size:11px; color:var(--taupe); margin-top:3px;}
+  .pill{display:inline-block; font-size:8.5px; letter-spacing:1.5px; font-weight:600; text-transform:uppercase; padding:5px 11px; border-radius:100px; background:var(--slateFill); color:var(--slate);}
+  .link{font-size:13px; color:var(--slate); font-weight:600; cursor:pointer; margin-top:16px; display:inline-flex; align-items:center; gap:5px;}
+
+  /* editorial photo timeline */
+  .ptl{display:flex; gap:11px; overflow-x:auto; padding-bottom:2px;}
+  .ptl::-webkit-scrollbar{height:0;}
+  .pcol{flex-shrink:0; display:flex; flex-direction:column; cursor:pointer;}
+  .pframe{width:104px; height:138px; border-radius:14px; position:relative; overflow:hidden; box-shadow:var(--soft); border:0.5px solid var(--line);}
+  .pframe.lg{width:122px; height:160px;}
+  .ph{position:absolute; inset:0;}
+  .grain{position:absolute; inset:0; opacity:.07; mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+  .vig{position:absolute; inset:0; background:linear-gradient(180deg, transparent 52%, rgba(40,28,16,.20));}
+  .pframe .tag{position:absolute; top:9px; left:9px; background:rgba(40,28,16,.4); color:#fff; font-size:8px; letter-spacing:1.5px; font-weight:600; padding:3px 8px; border-radius:100px; backdrop-filter:blur(3px);}
+  .pcap{font-size:10px; letter-spacing:1px; color:var(--taupe); font-weight:600; margin-top:9px; text-align:center; text-transform:uppercase;}
+  .padd{width:104px; height:138px; border-radius:14px; border:1.5px dashed var(--line); background:var(--glaze); display:flex; align-items:center; justify-content:center;}
+  .padd .plus{width:30px; height:30px; border-radius:50%; border:1.5px solid var(--taupe); color:var(--taupe); display:flex; align-items:center; justify-content:center; font-size:18px;}
+
+  /* weight */
+  .wsub{display:flex; gap:7px; align-items:baseline; flex-wrap:wrap;}
+
+  /* totals grid */
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:11px;}
+  .tcard{background:var(--card); border-radius:16px; padding:16px 18px; box-shadow:var(--soft);}
+  .tcard .tk{font-size:9px; letter-spacing:2px; color:var(--taupe); font-weight:600; text-transform:uppercase;}
+  .tcard .tv{font-size:26px; font-weight:700; letter-spacing:-1px; color:var(--espresso); margin-top:8px; line-height:1;}
+  .tcard .tv small{font-size:13px; font-weight:600; color:var(--taupe);}
+  .tcard .td{font-size:11px; color:var(--taupe); margin-top:5px;}
+
+  /* tab nav */
+  .tabnav{background:var(--glaze); padding:11px 12px 22px; border-top:0.5px solid var(--line); display:flex; justify-content:space-around; align-items:flex-start; flex-shrink:0;}
+  .tab{text-align:center; flex:1; display:flex; flex-direction:column; align-items:center;}
+  .tab .dot{width:6px; height:6px; border-radius:50%; border:1.5px solid var(--latte); margin-bottom:6px;}
+  .tab.on .dot{background:var(--espresso); border-color:var(--espresso);}
+  .tab .tl{font-size:8px; letter-spacing:1px; font-weight:600; color:var(--taupe); text-transform:uppercase;}
+  .tab.on .tl{color:var(--espresso);}
+
+  /* compare sheet */
+  .scrim{position:absolute; inset:0; background:rgba(26,16,10,.4); opacity:0; pointer-events:none; transition:opacity .32s var(--ease); z-index:20; border-radius:38px;}
+  .scrim.on{opacity:1; pointer-events:auto;}
+  .sheet{position:absolute; left:0; right:0; bottom:0; background:var(--glaze); border-radius:28px 28px 38px 38px; transform:translateY(102%); transition:transform .36s var(--ease); z-index:21; max-height:90%; display:flex; flex-direction:column;}
+  .sheet.on{transform:translateY(0);}
+  .handle{display:flex; justify-content:center; padding:11px 0 0;}
+  .handle i{width:36px; height:4px; background:var(--latte); border-radius:100px;}
+  .shead{padding:13px 24px 0; display:flex; justify-content:space-between; align-items:flex-end;}
+  .shead .st{font-weight:700; font-size:28px; color:var(--espresso); letter-spacing:-1.2px;}
+  .shead .x{background:transparent; border:none; color:var(--taupe); font-size:23px; cursor:pointer; padding:4px;}
+  .scon{overflow-y:auto; padding:8px 24px 22px;}
+  .cmp{display:flex; gap:14px; margin-top:8px;}
+  .cmp > div{flex:1;}
+  .cmp .ch{font-size:9px; letter-spacing:2px; color:var(--taupe); font-weight:600; text-transform:uppercase; text-align:center; margin-bottom:9px;}
+  .cmp .cbig{width:100%; aspect-ratio:3/4; border-radius:14px; overflow:hidden; position:relative; box-shadow:var(--soft); border:0.5px solid var(--line); background:linear-gradient(160deg,#EAE3D6,#D9D0C1); display:flex; align-items:center; justify-content:center;}
+  .cmp .cbig svg{opacity:.28;}
+  .cmp .cdate{text-align:center; font-size:11px; font-weight:600; color:var(--espresso); margin-top:9px;}
+  .cmpnote{font-size:13px; color:var(--cocoa); line-height:1.6; text-align:center; margin-top:18px; padding:0 6px;}
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="cap" style="opacity:.6;">Wren — Progress Tab Redesign · v1.2 · Week / Month / Year / All · ‹ › to move dates</div>
+  <div class="phone">
+    <div class="screen">
+      <div class="statusbar"><span>9:41</span><span class="d"><span>●●●</span><span>◗</span></span></div>
+      <div class="head">
+        <div><div class="eyebrow">Your arc</div><h1>progress</h1></div>
+        <div class="avatar">TG</div>
+      </div>
+      <div class="range" id="range"></div>
+      <div class="datenav" id="datenav"></div>
+      <div class="body"><div class="enter" id="bodyInner"></div></div>
+      <div class="tabnav">
+        <div class="tab"><div class="dot"></div><div class="tl">Coach</div></div>
+        <div class="tab"><div class="dot"></div><div class="tl">Food</div></div>
+        <div class="tab"><div class="dot"></div><div class="tl">Cycle</div></div>
+        <div class="tab"><div class="dot"></div><div class="tl">Workout</div></div>
+        <div class="tab on"><div class="dot"></div><div class="tl">Progress</div></div>
+      </div>
+      <div class="scrim" id="scrim" onclick="closeSheet()"></div>
+      <div class="sheet" id="sheet"></div>
+    </div>
+  </div>
+  <div class="cap" id="hint" style="opacity:.55;">Week view</div>
+</div>
+
+<script>
+const MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const MONF=["January","February","March","April","May","June","July","August","September","October","November","December"];
+const VIEWS=["week","month","year","all"];
+const C={cycle:"var(--lut)",move:"var(--slate)",mood:"var(--rose)",body:"var(--taupe)",weight:"var(--slate)",week:"var(--sage)",all:"var(--espresso)"};
+let view="week", off=0;
+function seeded(n){ const x=Math.sin((n+1)*99.73)*10000; return x-Math.floor(x); }
+function phaseName(day){ if(day<=5)return"Menstrual"; if(day<=13)return"Follicular"; if(day<=16)return"Ovulation"; return"Luteal"; }
+
+/* ---------- card shell ---------- */
+function card({eb,dot,hl,sub,chev=true,body="",cap=""}){
+  return `
+  <div class="secLabel"><span class="ld" style="background:${dot}"></span><span class="l">${eb}</span></div>
+  <div class="card">
+    <div class="ihead"><div><div class="ihl">${hl}</div>${sub?`<div class="isub">${sub}</div>`:''}</div>${chev?'<div class="chev">›</div>':''}</div>
+    ${body?`<div class="ibody">${body}</div>`:''}
+    ${cap?`<div class="idiv"><div class="icap">${cap}</div></div>`:''}
+  </div>`;
+}
+
+/* ---------- viz ---------- */
+function bars(data,labels,curIdx){
+  const max=Math.max(...data,1);
+  return `<div class="bars">${data.map((v,i)=>`<div class="bar ${i===curIdx?'cur':''}"><div class="track"><div class="col" style="height:${Math.max(5,(v/max)*100)}%"></div></div><div class="bl">${labels[i]}</div></div>`).join("")}</div>`;
+}
+function area(data,accent){
+  const w=300,h=64; const min=Math.min(...data),max=Math.max(...data); const rng=(max-min)||1;
+  const x=i=>i*(w/(data.length-1)); const y=v=>h-((v-min)/rng)*(h-14)-7;
+  const line=data.map((v,i)=>`${x(i)},${y(v)}`).join(" ");
+  const id='g'+Math.random().toString(36).slice(2,7);
+  return `<svg viewBox="0 0 ${w} ${h}" width="100%" height="64" preserveAspectRatio="none"><defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${accent}" stop-opacity=".20"/><stop offset="1" stop-color="${accent}" stop-opacity="0"/></linearGradient></defs><polygon points="0,${h} ${line} ${w},${h}" fill="url(#${id})"/><polyline points="${line}" fill="none" stroke="${accent}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+}
+function moodTimeline(days){
+  const W=300,H=42,n=days.length,pad=8;
+  const cmap={calm:'#A8B89B',happy:'#E8B86A',sensitive:'#D4A89E',stressed:'#B8765E'};
+  const x=i=>pad+i*((W-2*pad)/(n-1)); const y=i=>H/2+Math.sin(i*0.72)*7;
+  const dots=days.map((c,i)=>`<circle cx="${x(i)}" cy="${y(i)}" r="${c==='stressed'||c==='happy'?4.6:4}" fill="${cmap[c]}"/>`).join("");
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" height="42" preserveAspectRatio="none">${dots}</svg>`;
+}
+function moodLegend(){
+  return `<div class="mlegend">
+    <span class="mlg"><i style="background:#A8B89B"></i>Calm</span>
+    <span class="mlg"><i style="background:#E8B86A"></i>Happy</span>
+    <span class="mlg"><i style="background:#D4A89E"></i>Sensitive</span>
+    <span class="mlg"><i style="background:#B8765E"></i>Stressed</span>
+  </div>`;
+}
+function rings(cy){
+  return `<div class="ringrow">${cy.map(c=>`<div class="mr ${c.cur?'cur':''}"><div class="mring">${c.cur?'<div class="halo"></div>':''}<div class="bg"></div><div class="mc">${c.n}</div></div><div class="mrl">${c.m}</div></div>`).join("")}</div>`;
+}
+const CAM=`<svg viewBox="0 0 24 24" width="30" height="30" fill="none"><rect x="2.5" y="6" width="19" height="13" rx="2.5" stroke="#3B2F22" stroke-width="1.5"/><circle cx="12" cy="12.5" r="3.4" stroke="#3B2F22" stroke-width="1.5"/><path d="M8 6 L9.5 3.5 L14.5 3.5 L16 6" stroke="#3B2F22" stroke-width="1.5" stroke-linejoin="round"/></svg>`;
+
+/* ---------- shared sections ---------- */
+function pframe(tone,date,tag,lg){
+  return `<div class="pcol" onclick="openSheet()">
+    <div class="pframe ${lg?'lg':''}"><div class="ph" style="background:${tone}"></div><div class="grain"></div><div class="vig"></div>${tag?`<span class="tag">${tag}</span>`:''}</div>
+    <div class="pcap">${date}</div></div>`;
+}
+function bodyCard(){
+  const t1='radial-gradient(78% 44% at 50% 22%, rgba(255,255,255,.5), transparent 62%), linear-gradient(168deg,#DAD0C0,#B4A690 55%,#8C7E68)';
+  const t2='radial-gradient(78% 44% at 50% 22%, rgba(255,255,255,.45), transparent 62%), linear-gradient(168deg,#D8D6CD,#B2AFA1 55%,#847E6F)';
+  const t3='radial-gradient(78% 44% at 50% 22%, rgba(255,255,255,.45), transparent 62%), linear-gradient(168deg,#E1D3C1,#C2AD93 55%,#9A8268)';
+  return card({eb:'BODY', dot:C.body, hl:'Quietly recomposing', sub:'progress photos · since March', chev:true,
+    body:`<div class="ptl">
+        ${pframe(t1,'May 31','LATEST',true)}
+        ${pframe(t2,'May 20','',false)}
+        ${pframe(t3,'May 6','',false)}
+        <div class="pcol" onclick="openSheet()"><div class="padd"><div class="plus">+</div></div><div class="pcap" style="color:var(--taupe)">Add</div></div>
+      </div>
+      <div class="statrow" style="margin-top:18px;"><div><div class="sk">Body composition</div><div class="skd">Navy method · ~26% · trending down</div></div><span class="pill">Steady ↓</span></div>`,
+    cap:`Same pose, same light each time. Tap any two to compare — photos read direction better than the scale, and your Coach uses them to guide the plan, never as a verdict.`});
+}
+function weightCard(hl,sub,pts,cad){
+  return card({eb:'WEIGHT', dot:C.weight, hl:hl, sub:sub, chev:true,
+    body:area(pts,'var(--slate)'),
+    cap:`Shown as a ${cad} average, alongside your cycle — never day to day, since daily weight bounces with water and phase. You decide if this is useful; Wren works fine without it.`});
+}
+function moodCard(days,marks,sub){
+  return card({eb:'MOOD', dot:C.mood, hl:'mostly calm', sub:sub, chev:true,
+    body:`${moodTimeline(days)}<div class="wmk">${marks.map(m=>`<span>${m}</span>`).join("")}</div>${moodLegend()}`,
+    cap:`The stressed days line up with your luteal start. <b>That's real — worth planning around, not powering through.</b>`});
+}
+function cycleRingsCard(cy,sub){
+  return card({eb:'CYCLE', dot:C.cycle, hl:'28 days', sub:sub, chev:true,
+    body:rings(cy),
+    cap:`Steady at 28. Your body's consistent — <b>that's rare</b>, and worth keeping an eye on as we adjust things around it.`});
+}
+
+/* ---------- views ---------- */
+function rangeLabel(){
+  if(view==="all") return "All time · since Mar 2026";
+  if(view==="year") return String(2026-off);
+  if(view==="month"){ const d=new Date(2026,4-off,1); return `${MONF[d.getMonth()]} ${d.getFullYear()}`; }
+  const mon=new Date(2026,4,25); mon.setDate(mon.getDate()-off*7); const sun=new Date(mon); sun.setDate(sun.getDate()+6);
+  const a=`${MON[mon.getMonth()]} ${mon.getDate()}`, b=mon.getMonth()===sun.getMonth()?`${sun.getDate()}`:`${MON[sun.getMonth()]} ${sun.getDate()}`;
+  return `${a} – ${b}, ${sun.getFullYear()}`;
+}
+
+function weekView(){
+  const mins=[45,50,0,40,35,0,25].map((m,i)=> m===0?0:Math.max(15,Math.round(m+(seeded(off*7+i)-.5)*14)));
+  const logged=mins.map(m=>m>0); const done=logged.filter(Boolean).length; const tot=mins.reduce((a,b)=>a+b,0);
+  const day=((25-off*7)%28+28)%28+1; const avgW=146+Math.round(seeded(off+2)*4);
+  const wm=['calm','calm','happy','calm','sensitive','calm','calm'];
+  return [
+    card({eb:'THIS WEEK', dot:C.week, hl:`${done} of 6 sessions`, sub:rangeLabel(), chev:false,
+      body:`<div class="prbar"><i style="width:${(done/6)*100}%"></i></div><div class="weekdots">${["S","M","T","W","T","F","S"].map((d,i)=>`<div class="wd"><div class="wl">${d}</div><div class="wc ${logged[i]?'on':''}"></div></div>`).join("")}</div>`,
+      cap:`A calm week — <b>${tot} minutes</b> moving across ${done} days. Rest days are part of the plan, not a gap.`}),
+    card({eb:'MOVEMENT', dot:C.move, hl:`${tot} minutes`, sub:'active · by day', chev:true,
+      body:bars(mins,["S","M","T","W","T","F","S"], off===0?6:-1), cap:''}),
+    moodCard(wm,["S","M","T","W","T","F","S"],'one sensitive day · midweek'),
+    card({eb:'CYCLE', dot:C.cycle, hl:`${phaseName(day)} · day ${day}`, sub:'period in ~2 days', chev:true, body:'', cap:''}),
+    bodyCard(),
+    weightCard('Holding steady',`${avgW} lb · weekly average`,[avgW+1,avgW,avgW+1,avgW-1,avgW,avgW-1,avgW],'weekly'),
+  ].join("");
+}
+
+function monthView(){
+  const weeks=[3,4,2,5].map((v,i)=>Math.max(1,Math.min(6,Math.round(v+(seeded(off*4+i)-.5)*2))));
+  const sessions=weeks.reduce((a,b)=>a+b,0);
+  const wpts=[150,149,148,147].map((v,i)=>v+Math.round((seeded(off*5+i)-.5)*2));
+  const mm=Array(28).fill('calm'); [3,8,12].forEach(i=>mm[i]='happy'); [13,14,18,19].forEach(i=>mm[i]='sensitive'); [15,16].forEach(i=>mm[i]='stressed');
+  return [
+    card({eb:'THIS MONTH', dot:C.week, hl:`${sessions} of 24 sessions`, sub:rangeLabel(), chev:false,
+      body:`<div class="prbar"><i style="width:${Math.min(100,(sessions/24)*100)}%"></i></div>`,
+      cap:`You trained <b>${sessions} times</b> this month — about ${(sessions/4).toFixed(1)} a week. Steady is the goal, not maximal.`}),
+    card({eb:'MOVEMENT', dot:C.move, hl:'by the week', sub:'sessions · weeks 1–4', chev:true,
+      body:bars(weeks,["W1","W2","W3","W4"], off===0?3:-1), cap:''}),
+    moodCard(mm,["W1","W2","W3","W4"],'two stressed days · both week 3'),
+    cycleRingsCard([{m:'Mar',n:29},{m:'Apr',n:28},{m:'May',n:28,cur:true}],'average across 3 cycles'),
+    bodyCard(),
+    weightCard('Down gently',`${wpts[3]} lb · −2 lb this month`,wpts,'weekly'),
+  ].join("");
+}
+
+function yearView(){
+  const months=Array.from({length:12},(_,i)=>Math.max(4,Math.min(20,Math.round(14+(seeded(off*12+i)-.5)*9))));
+  const sessions=months.reduce((a,b)=>a+b,0);
+  const wpts=Array.from({length:12},(_,i)=>Math.round(153-i*0.5+(seeded(off*13+i)-.5)*2));
+  return [
+    card({eb:'THIS YEAR', dot:C.week, hl:`${sessions} sessions`, sub:`${(sessions/12).toFixed(1)} a week on average`, chev:false,
+      body:bars(months,["J","F","M","A","M","J","J","A","S","O","N","D"], off===0?4:-1),
+      cap:`Most consistent in spring; a dip near the holidays — <b>expected, not a failure</b>.`}),
+    cycleRingsCard([{m:'Mar',n:29},{m:'Apr',n:28},{m:'May',n:28,cur:true}],'average across 3 cycles'),
+    bodyCard(),
+    weightCard('Down gradually',`${wpts[11]} lb · −5 lb this year`,wpts,'monthly'),
+  ].join("");
+}
+
+function allView(){
+  const wpts=Array.from({length:14},(_,i)=>Math.round(153-i*0.45));
+  const months=Array.from({length:13},(_,i)=>Math.max(4,Math.round(8+i*0.5+(seeded(i)-.5)*5)));
+  return `
+    <div class="secLabel"><span class="ld" style="background:var(--espresso)"></span><span class="l">All time · since Mar 2026</span></div>
+    <div class="grid2">
+      <div class="tcard"><div class="tk">Sessions</div><div class="tv">96</div><div class="td">across 13 weeks</div></div>
+      <div class="tcard"><div class="tk">Cycles</div><div class="tv">4</div><div class="td">~28 day average</div></div>
+      <div class="tcard"><div class="tk">Days logged</div><div class="tv">78<small>%</small></div><div class="td">of all days</div></div>
+      <div class="tcard"><div class="tk">Weight</div><div class="tv">−6<small> lb</small></div><div class="td">gradual, since March</div></div>
+    </div>
+    ${card({eb:'MOVEMENT', dot:C.move, hl:'trending up, gently', sub:'sessions · by month', chev:true,
+        body:bars(months,["M","A","M","J","J","A","S","O","N","D","J","F","M"], months.length-1),
+        cap:`<b>96 sessions</b> and counting. Consistency, not intensity — exactly the point.`})}
+    ${cycleRingsCard([{m:'Mar',n:29},{m:'Apr',n:28},{m:'May',n:28,cur:true}],'average across 4 cycles')}
+    ${bodyCard()}
+    ${weightCard('Down 6 lb, calmly',`147 lb · since March`,wpts,'monthly')}`;
+}
+
+function render(){
+  document.getElementById('range').innerHTML = VIEWS.map(v=>`<button class="${v===view?'on':''}" onclick="setView('${v}')">${v[0].toUpperCase()+v.slice(1)}</button>`).join("");
+  const dn=document.getElementById('datenav');
+  if(view==="all") dn.innerHTML=`<span></span><span class="lbl">All time · since Mar 2026</span><span></span>`;
+  else dn.innerHTML=`<button onclick="moveDate(1)">‹</button><span class="lbl">${rangeLabel()}</span><button onclick="moveDate(-1)" ${off===0?'disabled':''}>›</button>`;
+  const v=view==="week"?weekView():view==="month"?monthView():view==="year"?yearView():allView();
+  const b=document.getElementById('bodyInner'); b.className='enter'; b.innerHTML=v;
+  document.getElementById('hint').textContent=view[0].toUpperCase()+view.slice(1)+' view';
+}
+function setView(v){ view=v; off=0; document.querySelector('.body').scrollTop=0; render(); }
+function moveDate(d){ off=Math.max(0,off+d); document.querySelector('.body').scrollTop=0; render(); }
+
+function sheetHTML(){
+  return `
+    <div class="handle"><i></i></div>
+    <div class="shead"><span class="st">compare</span><button class="x" onclick="closeSheet()">×</button></div>
+    <div class="scon">
+      <div class="cmp">
+        <div><div class="ch">Then · May 6</div><div class="cbig"><div class="ph" style="background:radial-gradient(76% 42% at 50% 20%, rgba(255,255,255,.45), transparent 62%), linear-gradient(168deg,#E1D3C1,#C2AD93 55%,#9A8268)"></div><div class="grain"></div><div class="vig"></div></div><div class="cdate">25 days ago</div></div>
+        <div><div class="ch">Now · May 31</div><div class="cbig"><div class="ph" style="background:radial-gradient(76% 42% at 50% 20%, rgba(255,255,255,.5), transparent 62%), linear-gradient(168deg,#DAD0C0,#B4A690 55%,#8C7E68)"></div><div class="grain"></div><div class="vig"></div></div><div class="cdate">Today</div></div>
+      </div>
+      <div class="cmpnote">Same pose, same light. Photos read direction better than the scale — your Coach uses them to guide the plan, never to judge.</div>
+    </div>`;
+}
+function openSheet(){ document.getElementById('sheet').innerHTML=sheetHTML(); document.getElementById('sheet').classList.add('on'); document.getElementById('scrim').classList.add('on'); }
+function closeSheet(){ document.getElementById('sheet').classList.remove('on'); document.getElementById('scrim').classList.remove('on'); }
+
+render();
+</script>
+</body>
+</html>

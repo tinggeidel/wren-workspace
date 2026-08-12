@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wren — Tab Icon Options</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/manrope@5.2.5/500.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/manrope@5.2.5/600.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/manrope@5.2.5/700.css">
+<style>
+  :root{
+    --bg:#EFE7DA; --glaze:#FBF7F0; --card:#FCFAF6; --ink:#3B2F22; --taupe:#8A7B68; --latte:#C8A989;
+    --line:rgba(59,47,34,0.10); --slate:#7E9AA0;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:var(--bg); font-family:'Manrope',system-ui,sans-serif; color:var(--ink); padding:34px 18px 60px;}
+  .wrap{max-width:430px; margin:0 auto;}
+  .h{font-size:9px; letter-spacing:3px; color:var(--taupe); font-weight:700; text-transform:uppercase; text-align:center;}
+  .title{font-size:30px; font-weight:700; letter-spacing:-1.2px; text-align:center; margin:8px 0 4px;}
+  .lede{font-size:13px; color:#6B5641; text-align:center; line-height:1.5; margin:0 auto 30px; max-width:330px;}
+
+  .opt{margin-bottom:30px;}
+  .optlabel{display:flex; align-items:baseline; gap:9px; margin:0 6px 12px;}
+  .optlabel .n{font-size:9px; letter-spacing:2px; color:var(--latte); font-weight:700;}
+  .optlabel .t{font-size:16px; font-weight:700; letter-spacing:-0.4px;}
+  .optlabel .d{font-size:11.5px; color:var(--taupe); margin-left:auto;}
+
+  /* enlarged icon row */
+  .big{background:var(--card); border-radius:18px; padding:20px 8px; display:flex; justify-content:space-around; box-shadow:0 1px 2px rgba(59,47,34,.04), 0 14px 30px -24px rgba(59,47,34,.2);}
+  .big .i{display:flex; flex-direction:column; align-items:center; gap:9px;}
+  .big svg{width:28px; height:28px;}
+  .big .nm{font-size:9px; letter-spacing:1px; color:var(--taupe); font-weight:600; text-transform:uppercase;}
+
+  /* tab-bar preview */
+  .barwrap{margin-top:10px; border-radius:0 0 22px 22px; background:var(--glaze); border-top:0.5px solid var(--line); padding:11px 10px 16px; display:flex; justify-content:space-around; box-shadow:0 14px 30px -24px rgba(59,47,34,.2);}
+  .barwrap .tab{display:flex; flex-direction:column; align-items:center; gap:6px; flex:1;}
+  .barwrap svg{width:22px; height:22px;}
+  .barwrap .tl{font-size:8px; letter-spacing:1px; font-weight:600; color:var(--taupe); text-transform:uppercase;}
+  .barwrap .tab.on .tl{color:var(--ink);}
+  .barcap{font-size:10px; color:var(--taupe); text-align:center; margin-top:8px; letter-spacing:.3px;}
+
+  /* ---- style A: fine line ---- */
+  .setA svg{fill:none; stroke:var(--taupe); stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round;}
+  .setA .on svg, .setA.allink svg{stroke:var(--ink);}
+
+  /* ---- style B: soft solid (active filled) ---- */
+  .setB svg{fill:none; stroke:var(--taupe); stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round;}
+  .setB .on svg{fill:var(--ink); stroke:var(--ink);}
+  .setB.allink svg{fill:var(--ink); stroke:var(--ink);}
+  .setB .on svg .cut{fill:var(--glaze); stroke:none;}
+  .setB.allink svg .cut{fill:var(--card); stroke:none;}
+
+  /* ---- style C: organic ---- */
+  .setC svg{fill:none; stroke:var(--taupe); stroke-width:2; stroke-linecap:round; stroke-linejoin:round;}
+  .setC .on svg, .setC.allink svg{stroke:var(--ink);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="h">Wren · navigation</div>
+  <div class="title">Tab icon options</div>
+  <div class="lede">Five tabs: Coach · Food · Cycle · Workout · Progress. Three directions below — each shown enlarged, then in the live tab bar with Cycle active.</div>
+
+  <!-- ============ OPTION A — FINE LINE ============ -->
+  <div class="opt">
+    <div class="optlabel"><span class="n">A</span><span class="t">Fine line</span><span class="d">Editorial, precise, 1.7px</span></div>
+    <div class="big setA allink">
+      <div class="i">
+        <svg viewBox="0 0 24 24"><path d="M4 7a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v5a3 3 0 0 1-3 3H10l-4 3v-3H7a3 3 0 0 1-3-3z"/></svg>
+        <span class="nm">Coach</span>
+      </div>
+      <div class="i">
+        <svg viewBox="0 0 24 24"><path d="M12 8.5C10.3 6 6.5 6.3 5.3 9.4c-1 2.7.4 6.6 2.7 8.6 1 .9 2 .7 2.9.3.6-.3 1.6-.3 2.2 0 .9.4 1.9.6 2.9-.3 2.3-2 3.7-5.9 2.7-8.6C17.5 6.3 13.7 6 12 8.5z"/><path d="M12 8.5c0-2.2 1.4-3.6 3.3-3.6"/></svg>
+        <span class="nm">Food</span>
+      </div>
+      <div class="i">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="18" cy="7.6" r="1.7" fill="currentColor" stroke="none"/></svg>
+        <span class="nm">Cycle</span>
+      </div>
+      <div class="i">
+        <svg viewBox="0 0 24 24"><path d="M3 9.5v5M6 7.5v9M18 7.5v9M21 9.5v5M6 12h12"/></svg>
+        <span class="nm">Workout</span>
+      </div>
+      <div class="i">
+        <svg viewBox="0 0 24 24"><polyline points="4,15 9,10 13,13 20,6"/><circle cx="9" cy="10" r="1.1" fill="currentColor" stroke="none"/><circle cx="13" cy="13" r="1.1" fill="currentColor" stroke="none"/><circle cx="20" cy="6" r="1.1" fill="currentColor" stroke="none"/></svg>
+        <span class="nm">Progress</span>
+      </div>
+    </div>
+    <div class="barwrap setA">
+      <div class="tab"><svg viewBox="0 0 24 24"><path d="M4 7a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v5a3 3 0 0 1-3 3H10l-4 3v-3H7a3 3 0 0 1-3-3z"/></svg><span class="tl">Coach</span></div>
+      <div class="tab"><svg viewBox="0 0 24 24"><path d="M12 8.5C10.3 6 6.5 6.3 5.3 9.4c-1 2.7.4 6.6 2.7 8.6 1 .9 2 .7 2.9.3.6-.3 1.6-.3 2.2 0 .9.4 1.9.6 2.9-.3 2.3-2 3.7-5.9 2.7-8.6C17.5 6.3 13.7 6 12 8.5z"/><path d="M12 8.5c0-2.2 1.4-3.6 3.3-3.6"/></svg><span class="tl">Food</span></div>
+      <div class="tab on"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="18" cy="7.6" r="1.7" fill="currentColor" stroke="none"/></svg><span class="tl">Cycle</span></div>
+      <div class="tab"><svg viewBox="0 0 24 24"><path d="M3 9.5v5M6 7.5v9M18 7.5v9M21 9.5v5M6 12h12"/></svg><span class="tl">Workout</span></div>
+      <div class="tab"><svg viewBox="0 0 24 24"><polyline points="4,15 9,10 13,13 20,6"/></svg><span class="tl">Progress</span></div>
+    </div>
+    <div class="barcap">Live tab bar · Cycle active</div>
+  </div>
+
+  <!-- ============ OPTION B — SOFT SOLID ============ -->
+  <div class="opt">
+    <div class="optlabel"><span class="n">B</span><span class="t">Soft solid</span><span class="d">Active fills in, inactive outline</span></div>
+    <div class="big setB allink">
+      <div class="i">
+        <svg viewBox="0 0 24 24"><path d="M4 7a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v5a3 3 0 0 1-3 3H10l-4 3v-3H7a3 3 0 0 1-3-3z"/></svg>
+        <span class="nm">Coach</span>
+      </div>
+      <div class="i">
+        <svg viewBox="0 0 24 24"><path d="M4 11h16a8 8 0 0 1-16 0z"/><path d="M9 6.5c0 1.2-1 1.6-1 2.8M13 5.5c0 1.4-1.2 1.8-1.2 3" class="cut" fill="none" stroke="var(--glaze)"/></svg>
+        <span class="nm">Food</span>
+      </div>
+      <div class="i">
+        <svg viewBox="0 0 24 24"><path d="M12 3.5c3.6 4.6 5.5 7.2 5.5 10a5.5 5.5 0 0 1-11 0c0-2.8 1.9-5.4 5.5-10z"/></svg>
+        <span class="nm">Cycle</span>
+      </div>
+      <div class="i">
+        <svg viewBox="0 0 24 24"><rect x="3" y="9.5" width="3" height="5" rx="1.2"/><rect x="18" y="9.5" width="3" height="5" rx="1.2"/><rect x="6.5" y="7.5" width="3" height="9" rx="1.3"/><rect x="14.5" y="7.5" width="3" height="9" rx="1.3"/><rect x="9" y="11" width="6" height="2" rx="1"/></svg>
+        <span class="nm">Workout</span>
+      </div>
+      <div class="i">
+        <svg viewBox="0 0 24 24"><rect x="4" y="13" width="3.4" height="7" rx="1.2"/><rect x="10.3" y="9" width="3.4" height="11" rx="1.2"/><rect x="16.6" y="5" width="3.4" height="15" rx="1.2"/></svg>
+        <span class="nm">Progress</span>
+      </div>
+    </div>
+    <div class="barwrap setB">
+      <div class="tab"><svg viewBox="0 0 24 24"><path d="M4 7a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v5a3 3 0 0 1-3 3H10l-4 3v-3H7a3 3 0 0 1-3-3z"/></svg><span class="tl">Coach</span></div>
+      <div class="tab"><svg viewBox="0 0 24 24"><path d="M4 11h16a8 8 0 0 1-16 0z"/></svg><span class="tl">Food</span></div>
+      <div class="tab on"><svg viewBox="0 0 24 24"><path d="M12 3.5c3.6 4.6 5.5 7.2 5.5 10a5.5 5.5 0 0 1-11 0c0-2.8 1.9-5.4 5.5-10z"/></svg><span class="tl">Cycle</span></div>
+      <div class="tab"><svg viewBox="0 0 24 24"><rect x="3" y="9.5" width="3" height="5" rx="1.2"/><rect x="18" y="9.5" width="3" height="5" rx="1.2"/><rect x="6.5" y="7.5" width="3" height="9" rx="1.3"/><rect x="14.5" y="7.5" width="3" height="9" rx="1.3"/><rect x="9" y="11" width="6" height="2" rx="1"/></svg><span class="tl">Workout</span></div>
+      <div class="tab"><svg viewBox="0 0 24 24"><rect x="4" y="13" width="3.4" height="7" rx="1.2"/><rect x="10.3" y="9" width="3.4" height="11" rx="1.2"/><rect x="16.6" y="5" width="3.4" height="15" rx="1.2"/></svg><span class="tl">Progress</span></div>
+    </div>
+    <div class="barcap">Live tab bar · Cycle active (filled)</div>
+  </div>
+
+  <!-- ============ OPTION C — ORGANIC ============ -->
+  <div class="opt">
+    <div class="optlabel"><span class="n">C</span><span class="t">Organic</span><span class="d">Softer, warmer, 'clean girl'</span></div>
+    <div class="big setC allink">
+      <div class="i">
+        <svg viewBox="0 0 24 24"><path d="M5 6.5C8 4 16 4 19 6.5s2.5 7-1 9c-.6.4-.7 1.5-2 2.5 0-1-.4-1.3-1.4-1.2-3 .3-6.6-.1-8.6-1.8-3.5-2-3-6.5-1-8.5z"/></svg>
+        <span class="nm">Coach</span>
+      </div>
+      <div class="i">
+        <svg viewBox="0 0 24 24"><path d="M12 21c0-7 3.5-11 8-13-.5 7-4 11.5-8 13z"/><path d="M12 21c0-5-2.5-8.5-6-10"/></svg>
+        <span class="nm">Food</span>
+      </div>
+      <div class="i">
+        <svg viewBox="0 0 24 24"><path d="M12 4c1.2 2.4 3.6 2.4 4.8 0M12 20c-1.2-2.4-3.6-2.4-4.8 0M4 12c2.4-1.2 2.4-3.6 0-4.8M20 12c-2.4 1.2-2.4 3.6 0 4.8" /><circle cx="12" cy="12" r="2.4"/></svg>
+        <span class="nm">Cycle</span>
+      </div>
+      <div class="i">
+        <svg viewBox="0 0 24 24"><path d="M3 12h3l2-6 4 13 3-9 2 2h4"/></svg>
+        <span class="nm">Workout</span>
+      </div>
+      <div class="i">
+        <svg viewBox="0 0 24 24"><path d="M4 16c3 .5 5-2 7-5s4-5 7-4"/><path d="M4 20c4 0 7-3 9-7"/></svg>
+        <span class="nm">Progress</span>
+      </div>
+    </div>
+    <div class="barwrap setC">
+      <div class="tab"><svg viewBox="0 0 24 24"><path d="M5 6.5C8 4 16 4 19 6.5s2.5 7-1 9c-.6.4-.7 1.5-2 2.5 0-1-.4-1.3-1.4-1.2-3 .3-6.6-.1-8.6-1.8-3.5-2-3-6.5-1-8.5z"/></svg><span class="tl">Coach</span></div>
+      <div class="tab"><svg viewBox="0 0 24 24"><path d="M12 21c0-7 3.5-11 8-13-.5 7-4 11.5-8 13z"/><path d="M12 21c0-5-2.5-8.5-6-10"/></svg><span class="tl">Food</span></div>
+      <div class="tab on"><svg viewBox="0 0 24 24"><path d="M12 4c1.2 2.4 3.6 2.4 4.8 0M12 20c-1.2-2.4-3.6-2.4-4.8 0M4 12c2.4-1.2 2.4-3.6 0-4.8M20 12c-2.4 1.2-2.4 3.6 0 4.8"/><circle cx="12" cy="12" r="2.4"/></svg><span class="tl">Cycle</span></div>
+      <div class="tab"><svg viewBox="0 0 24 24"><path d="M3 12h3l2-6 4 13 3-9 2 2h4"/></svg><span class="tl">Workout</span></div>
+      <div class="tab"><svg viewBox="0 0 24 24"><path d="M4 16c3 .5 5-2 7-5s4-5 7-4"/><path d="M4 20c4 0 7-3 9-7"/></svg><span class="tl">Progress</span></div>
+    </div>
+    <div class="barcap">Live tab bar · Cycle active</div>
+  </div>
+
+  <div class="barcap" style="margin-top:24px; opacity:.7;">A = chat bubble · apple · phase ring · dumbbell · trend line<br>B = bubble · bowl · droplet · weights · bars (active fills)<br>C = soft bubble · leaf sprig · bloom · pulse · flowing trend</div>
+</div>
+</body>
+</html>
